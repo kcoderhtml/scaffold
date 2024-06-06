@@ -38,6 +38,11 @@
 				"projectId": "98aea9e7-5704-4136-96f0-cc91d2ef5dfc"
 			}
 		},
+		"expo": {
+			"experiments": {
+				"typedRoutes": true
+			}
+		},
 		"owner": "kilowatt8696"
 	}
 }
