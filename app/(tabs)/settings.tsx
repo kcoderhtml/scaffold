@@ -1,5 +1,4 @@
-import { Link, Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { Stack } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 
@@ -11,9 +10,6 @@ export default function Settings() {
 			<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
 				Welcome to the Settings Menu!
 			</Text>
-
-			<Link href={{ pathname: "(tabs)/home" }}>Home</Link>
-			<StatusBar style="auto" />
 		</View>
 	);
 }
