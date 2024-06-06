@@ -28,7 +28,7 @@ export default function NotFoundScreen() {
 			/>
 
 			<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
-				This screen doesn't exist.
+				This page doesn't exist.
 			</Text>
 
 			<Link href="/" asChild>
