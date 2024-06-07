@@ -1,15 +1,51 @@
 import { Stack } from "expo-router";
-import React from "react";
-import { Text, View, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { Text, View, ScrollView, RefreshControl } from "react-native";
 
 import Card from "../../components/card";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 export default function Home() {
+	const [cardData, setCardData] = React.useState([]); // State for card data
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const allImages = await AsyncStorage.getItem("images");
+			if (allImages) {
+				const images = JSON.parse(allImages);
+				setCardData(images); // Update state with fetched data
+			} else {
+				alert("You have no images saved.");
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	const fetchData = async () => {
+		setCardData([]); // Set empty array to show refresh indicator
+
+		const allImages = await AsyncStorage.getItem("images");
+		if (allImages) {
+			const images = JSON.parse(allImages);
+			setCardData(images);
+		} else {
+			alert("You have no images saved.");
+		}
+	};
+
 	return (
-		<View className="bg-slate-50 dark:bg-slate-700">
+		<View className="flex-1 bg-slate-50 dark:bg-slate-700">
 			<ScrollView
 				contentContainerStyle={{ flexGrow: 1 }}
 				overScrollMode="never"
+				refreshControl={
+					<RefreshControl
+						refreshing={cardData.length === 0} // Show refresh indicator while fetching
+						onRefresh={fetchData} // Function to call on pull down
+					/>
+				}
 			>
 				<View className="flex-1 items-center">
 					<Stack.Screen options={{ title: "Home" }} />
@@ -24,29 +60,14 @@ export default function Home() {
 					</Text>
 
 					<View className="flex flex-wrap">
-						<Card
-							title="test card"
-							description="a description that is rather small"
-						></Card>
-						<Card
-							title="test card with image"
-							description="a description that is rather small"
-							image="https://source.unsplash.com/random/800x600"
-						></Card>
-						<Card
-							title="test card with no image"
-							description="a bountifully long description that excedes the length of the previous cards"
-						></Card>
-						<Card
-							title="test card with image and description"
-							description="a description that is rather small"
-							image="https://source.unsplash.com/random/800x600"
-						></Card>
-
-						<Card
-							title="another test card"
-							description="a description; kinda long"
-						></Card>
+						{cardData.map((image, index) => (
+							<Card
+								key={index}
+								image={image}
+								title="Image"
+								description="A beautiful image."
+							/>
+						))}
 					</View>
 				</View>
 			</ScrollView>
