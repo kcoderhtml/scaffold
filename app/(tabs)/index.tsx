@@ -1,4 +1,3 @@
-import { Stack } from "expo-router";
 import React, { useEffect } from "react";
 import { Text, View, ScrollView, RefreshControl } from "react-native";
 
@@ -50,8 +49,6 @@ export default function Home() {
 				}
 			>
 				<View className="flex-1 items-center">
-					<Stack.Screen options={{ title: "Home" }} />
-
 					<Text className="text-2xl font-bold mt-12 text-slate-900 dark:text-slate-50">
 						Welcome to Scaffold 🚀
 					</Text>
