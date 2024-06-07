@@ -13,7 +13,10 @@
 			"backgroundColor": "#177A85"
 		},
 		"ios": {
-			"supportsTablet": true
+			"supportsTablet": true,
+			"config": {
+				"usesNonExemptEncryption": false
+			}
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -32,6 +35,12 @@
 				"expo-image-picker",
 				{
 					"photosPermission": "The app accesses your photos to let you add images to your scaffold."
+				}
+			],
+			[
+				"expo-secure-store",
+				{
+					"faceIDPermission": "Allow scaffold to access your Face ID biometric data."
 				}
 			]
 		],
