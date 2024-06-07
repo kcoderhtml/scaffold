@@ -75,8 +75,8 @@ export default function ImagePickerExample() {
 					JSON.stringify([
 						{
 							uri: result.assets[0].uri,
-							title: "New Image",
-							description: "New Image Description",
+							title: "",
+							description: "",
 						},
 					])
 				);
