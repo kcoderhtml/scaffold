@@ -46,8 +46,6 @@ export default function ImagePickerExample() {
 
 	return (
 		<View className="flex-1 items-center bg-slate-50 dark:bg-slate-700">
-			<Stack.Screen options={{ title: "Settings" }} />
-
 			<Text className="text-xl text-center font-bold m-16 text-slate-900 dark:text-slate-50">
 				Select an Image to add to your collection! 📸
 			</Text>
