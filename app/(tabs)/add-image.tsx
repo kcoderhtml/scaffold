@@ -17,8 +17,8 @@ export default function ImagePickerExample() {
 				const images = JSON.parse(allImages);
 				images.push({
 					uri: result.assets[0].uri,
-					title: "New Image",
-					description: "New Image Description",
+					title: "",
+					description: "",
 				});
 				await AsyncStorage.setItem("images", JSON.stringify(images));
 			} else {
