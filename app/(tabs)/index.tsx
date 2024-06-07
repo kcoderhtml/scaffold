@@ -16,7 +16,6 @@ export default function Home() {
 			const allImages = await AsyncStorage.getItem("images");
 			if (allImages) {
 				const images = JSON.parse(allImages);
-				console.log(images);
 				setCardData(images); // Update state with fetched data
 			} else {
 				alert("You have no images saved.");
@@ -32,7 +31,6 @@ export default function Home() {
 		const allImages = await AsyncStorage.getItem("images");
 		if (allImages) {
 			const images = JSON.parse(allImages);
-			console.log(images);
 			setCardData(images);
 		} else {
 			alert("You have no images saved.");
