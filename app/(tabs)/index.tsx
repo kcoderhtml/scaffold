@@ -2,17 +2,9 @@ import { Stack } from "expo-router";
 import React from "react";
 import { Text, View, ScrollView } from "react-native";
 
-import { useColorScheme } from "react-native";
-import colors from "tailwindcss/colors";
-
 import Card from "../../components/card";
 
 export default function Home() {
-	const colorScheme = useColorScheme();
-
-	const backgroundColor =
-		colorScheme === "dark" ? colors.gray[800] : colors.gray[100];
-
 	return (
 		<View className="bg-slate-50 dark:bg-slate-700">
 			<ScrollView
