@@ -48,6 +48,13 @@ export default function TabLayout() {
 					tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
 				}}
 			/>
+			<Tabs.Screen
+				name="add-image"
+				options={{
+					title: "Add Image",
+					tabBarIcon: ({ color }) => <TabBarIcon name="image" color={color} />,
+				}}
+			/>
 		</Tabs>
 	);
 }
