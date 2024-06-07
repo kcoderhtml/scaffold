@@ -17,12 +17,16 @@ const Card: React.FC<CardProps> = ({ image, title, description }) => {
 				/>
 			)}
 			<View className="w-56">
-				<Text className="text-xl font-bold text-slate-900 dark:text-slate-50 p-2 text-center">
-					{title}
-				</Text>
-				<Text className="text-slate-900 dark:text-slate-50 pl-2 pr-2 pb-2 text-center">
-					{description}
-				</Text>
+				{title !== "" && (
+					<Text className="text-xl font-bold text-slate-900 dark:text-slate-50 p-2 text-center">
+						{title}
+					</Text>
+				)}
+				{description !== "" && (
+					<Text className="text-slate-900 dark:text-slate-50 pl-2 pr-2 pb-2 text-center">
+						{description}
+					</Text>
+				)}
 			</View>
 		</View>
 	);
