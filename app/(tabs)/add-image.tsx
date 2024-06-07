@@ -15,18 +15,33 @@ export default function ImagePickerExample() {
 			const allImages = await AsyncStorage.getItem("images");
 			if (allImages) {
 				const images = JSON.parse(allImages);
-				images.push(result.assets[0].uri);
+				images.push({
+					uri: result.assets[0].uri,
+					title: "New Image",
+					description: "New Image Description",
+				});
 				await AsyncStorage.setItem("images", JSON.stringify(images));
 			} else {
 				await AsyncStorage.setItem(
 					"images",
-					JSON.stringify([result.assets[0].uri])
+					JSON.stringify([
+						{
+							uri: result.assets[0].uri,
+							title: "New Image",
+							description: "New Image Description",
+						},
+					])
 				);
 			}
 			console.log(result);
 		} else {
 			alert("You did not select any image.");
 		}
+	};
+
+	const clearImages = async () => {
+		await AsyncStorage.removeItem("images");
+		alert("All images have been removed.");
 	};
 
 	return (
@@ -43,6 +58,15 @@ export default function ImagePickerExample() {
 			>
 				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
 					Select an Image
+				</Text>
+			</Pressable>
+
+			<Pressable
+				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
+				onPress={clearImages}
+			>
+				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+					Clear All Images
 				</Text>
 			</Pressable>
 		</View>

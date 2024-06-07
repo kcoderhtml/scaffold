@@ -7,13 +7,16 @@ import Card from "../../components/card";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
-	const [cardData, setCardData] = React.useState([]); // State for card data
+	const [cardData, setCardData] = React.useState<
+		{ uri: string; title: string; description: string }[]
+	>([]); // State for card data
 
 	useEffect(() => {
 		const fetchData = async () => {
 			const allImages = await AsyncStorage.getItem("images");
 			if (allImages) {
 				const images = JSON.parse(allImages);
+				console.log(images);
 				setCardData(images); // Update state with fetched data
 			} else {
 				alert("You have no images saved.");
@@ -29,6 +32,7 @@ export default function Home() {
 		const allImages = await AsyncStorage.getItem("images");
 		if (allImages) {
 			const images = JSON.parse(allImages);
+			console.log(images);
 			setCardData(images);
 		} else {
 			alert("You have no images saved.");
@@ -60,12 +64,12 @@ export default function Home() {
 					</Text>
 
 					<View className="flex flex-wrap">
-						{cardData.map((image, index) => (
+						{cardData.map((data, index) => (
 							<Card
 								key={index}
-								image={image}
-								title="Image"
-								description="A beautiful image."
+								image={data.uri}
+								title={data.title}
+								description={data.description}
 							/>
 						))}
 					</View>
