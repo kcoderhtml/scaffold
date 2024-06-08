@@ -50,13 +50,15 @@ const Card: React.FC<CardProps> = ({ image, title, description, onPress }) => {
 						toValue: 0.9,
 						duration: 100,
 						useNativeDriver: true,
-					}).start(({ finished }) => {
+					}).start(async ({ finished }) => {
 						// run onPress function after animation
 						if (finished && onPress) {
-							onPress();
+							await onPress();
 							Haptics.notificationAsync(
 								Haptics.NotificationFeedbackType.Success
 							);
+							scale.setValue(1);
+							setCritPressed(false);
 						}
 					});
 				}
@@ -67,7 +69,7 @@ const Card: React.FC<CardProps> = ({ image, title, description, onPress }) => {
 				style={{
 					transform: [{ scale }],
 					borderWidth: critPressed ? 2 : 0,
-					borderColor: "red",
+					borderColor: critPressed ? "red" : "transparent",
 				}}
 			>
 				{image && (
