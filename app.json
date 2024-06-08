@@ -1,7 +1,7 @@
 {
 	"expo": {
-		"name": "scaffold",
-		"slug": "scaffold",
+		"name": "Sk4ph; memoir for your mind",
+		"slug": "sk4ph",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
@@ -17,7 +17,7 @@
 			"config": {
 				"usesNonExemptEncryption": false
 			},
-			"bundleIdentifier": "com.kieranklukas.scaffold"
+			"bundleIdentifier": "com.kieranklukas.sk4ph"
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -35,13 +35,13 @@
 			[
 				"expo-image-picker",
 				{
-					"photosPermission": "The app accesses your photos to let you add images to your scaffold."
+					"photosPermission": "The app accesses your photos to let you add images to your Sk4ph."
 				}
 			],
 			[
 				"expo-secure-store",
 				{
-					"faceIDPermission": "Allow scaffold to access your Face ID biometric data."
+					"faceIDPermission": "Allow Sk4ph to access your Face ID biometric data."
 				}
 			]
 		],
@@ -53,7 +53,7 @@
 				"origin": false
 			},
 			"eas": {
-				"projectId": "98aea9e7-5704-4136-96f0-cc91d2ef5dfc"
+				"projectId": "7e0165c6-5343-4120-8c89-b42a9d23b9f2"
 			}
 		},
 		"owner": "kilowatt8696"
