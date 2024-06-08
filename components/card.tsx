@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Text, View, Image, Pressable, Animated } from "react-native";
 
+import * as Haptics from "expo-haptics";
+
 interface CardProps {
 	image?: string;
 	title: string;
@@ -29,6 +31,7 @@ const Card: React.FC<CardProps> = ({ image, title, description, onPress }) => {
 					// if the press was held for the duration and animation completed, set critPressed to true
 					if (finished) {
 						setCritPressed(true);
+						Haptics.selectionAsync();
 					}
 				});
 			}}
@@ -51,6 +54,9 @@ const Card: React.FC<CardProps> = ({ image, title, description, onPress }) => {
 						// run onPress function after animation
 						if (finished && onPress) {
 							onPress();
+							Haptics.notificationAsync(
+								Haptics.NotificationFeedbackType.Success
+							);
 						}
 					});
 				}
