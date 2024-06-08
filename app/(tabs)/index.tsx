@@ -9,6 +9,7 @@ export default function Home() {
 	const [cardData, setCardData] = React.useState<
 		{ uri: string; title: string; description: string }[]
 	>([]); // State for card data
+	const [refreshing, setRefreshing] = React.useState(false); // State for refresh indicator
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -25,14 +26,16 @@ export default function Home() {
 	}, []);
 
 	const fetchData = async () => {
-		setCardData([]); // Set empty array to show refresh indicator
+		setRefreshing(true); // Show refresh indicator
 
 		const allImages = await AsyncStorage.getItem("images");
 		if (allImages) {
 			const images = JSON.parse(allImages);
 			setCardData(images);
+			setRefreshing(false); // Hide refresh indicator
 		} else {
 			alert("You have no images saved.");
+			setRefreshing(false); // Hide refresh indicator
 		}
 	};
 
@@ -53,7 +56,7 @@ export default function Home() {
 				overScrollMode="never"
 				refreshControl={
 					<RefreshControl
-						refreshing={cardData.length === 0} // Show refresh indicator while fetching
+						refreshing={refreshing} // Show refresh indicator while fetching
 						onRefresh={fetchData} // Function to call on pull down
 					/>
 				}
