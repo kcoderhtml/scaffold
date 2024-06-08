@@ -4,35 +4,22 @@ import React from "react";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import * as SecureStore from "expo-secure-store";
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import * as tf from "@tensorflow/tfjs";
+import { fetch, decodeJpeg } from "@tensorflow/tfjs-react-native";
+import * as mobilenet from "@tensorflow-models/mobilenet";
 
-import * as ExpoFileSystem from "expo-file-system";
+async function describeImage(asset: any) {
+	const image = await fetch(asset.uri, {}, { isBinary: true });
 
-async function fileToGenerativePart(path: string, mimeType: string) {
-	try {
-		const base64image = await ExpoFileSystem.readAsStringAsync(path, {
-			encoding: ExpoFileSystem.EncodingType.Base64,
-		});
-		return {
-			inlineData: {
-				data: base64image,
-				mimeType,
-			},
-		};
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
-}
+	await tf.ready();
+	const model = await mobilenet.load();
 
-async function describeImage(model: any, asset: any) {
-	const aiResult = await model.generateContent([
-		'You are to analyze the content of this image and generate a short and conscise json object like the following {"title": "bowl of penne", "description": "a red bowl of penne pasta with pesto"}',
-		await fileToGenerativePart(asset.uri, asset.mimeType!),
-	]);
-	const response = await aiResult.response;
-	const analysis = response.text();
+	const imageDataArrayBuffer = await image.arrayBuffer();
+	const imageData = new Uint8Array(imageDataArrayBuffer);
+	const imageTensor = decodeJpeg(imageData);
+	const prediction = await model.classify(imageTensor);
+
+	const analysis = JSON.stringify(prediction[0]);
 
 	console.log(analysis);
 
@@ -42,16 +29,6 @@ async function describeImage(model: any, asset: any) {
 }
 
 export default function ImagePickerExample() {
-	const [apiKey, setApiKey] = React.useState<string | null>(null); // State for API key
-
-	React.useEffect(() => {
-		const getApiKey = async () => {
-			const retrievedKey = await SecureStore.getItemAsync("GEMINI_API_KEY");
-			setApiKey(retrievedKey);
-		};
-		getApiKey();
-	}, []);
-
 	const pickImageAsync = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			allowsEditing: true,
@@ -61,18 +38,11 @@ export default function ImagePickerExample() {
 		if (!result.canceled) {
 			const allImages = await AsyncStorage.getItem("images");
 
-			const genAI = new GoogleGenerativeAI(apiKey);
-			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
 			if (allImages) {
 				const images = JSON.parse(allImages);
 
 				try {
-					if (!apiKey) {
-						throw new Error("No API key found.");
-					}
-
-					const analysisObject = await describeImage(model, result.assets[0]);
+					const analysisObject = await describeImage(result.assets[0]);
 
 					images.push({
 						uri: result.assets[0].uri,
@@ -91,10 +61,7 @@ export default function ImagePickerExample() {
 				await AsyncStorage.setItem("images", JSON.stringify(images));
 			} else {
 				try {
-					if (!apiKey) {
-						throw new Error("No API key found.");
-					}
-					const analysisObject = await describeImage(model, result.assets[0]);
+					const analysisObject = await describeImage(result.assets[0]);
 
 					await AsyncStorage.setItem(
 						"images",
