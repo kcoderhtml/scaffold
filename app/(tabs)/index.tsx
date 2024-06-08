@@ -36,6 +36,16 @@ export default function Home() {
 		}
 	};
 
+	const removeItem = async (index: number) => {
+		const allImages = await AsyncStorage.getItem("images");
+		if (allImages) {
+			const images = JSON.parse(allImages);
+			images.splice(index, 1);
+			await AsyncStorage.setItem("images", JSON.stringify(images));
+			setCardData(images);
+		}
+	};
+
 	return (
 		<View className="flex-1 bg-slate-50 dark:bg-slate-700">
 			<ScrollView
@@ -65,6 +75,7 @@ export default function Home() {
 								image={data.uri}
 								title={data.title}
 								description={data.description}
+								onPress={() => removeItem(index)}
 							/>
 						))}
 					</View>
