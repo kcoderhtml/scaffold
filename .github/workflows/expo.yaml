@@ -25,7 +25,7 @@ jobs:
         run: bun install
 
       - name: 🚀 Build app
-        run: eas build --non-interactive --platform ios --local --output-dir ./builds
+        run: mkdir builds; eas build --non-interactive --platform ios --local --output ./builds
 
       - name: 📦 Publish ipa to releases
         uses: svenstaro/upload-release-action@v2
