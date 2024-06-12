@@ -1,0 +1,37 @@
+on:
+  push:
+    tags:
+      - "v*.*.*"
+permissions:
+  contents: write
+name: Expo Build
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v3
+
+      - name: 🏗 Setup bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: 🏗 Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: bun install
+
+      - name: 🚀 Build app
+        run: eas build --non-interactive --platform ios --local --output-dir ./builds
+
+      - name: 📦 Publish ipa to releases
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./builds/*.ipa
+          asset_name: "app.ipa"
+          tag: ${{ github.ref }}
+          overwrite: true
