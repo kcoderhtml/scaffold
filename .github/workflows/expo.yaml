@@ -25,13 +25,13 @@ jobs:
         run: bun install
 
       - name: 🚀 Build app
-        run: mkdir builds; eas build -p ios --local --non-interactive --output build.ipa
+        run: mkdir builds; eas build -p ios --local --non-interactive --output builds/build.ipa
 
       - name: 📦 Publish ipa to releases
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./build.ipa
+          file: ./builds/build.ipa
           asset_name: "app.ipa"
           tag: ${{ github.ref }}
           overwrite: true
