@@ -1,0 +1,20 @@
+on: workflow_dispatch
+  
+permissions:
+  contents: write
+name: iOS upload
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: 🏗 Setup bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: 🏗 Install ios-uploader
+        run: bun install -g ios-uploader
+
+      - name: download file
+        run: wget https://github.com/kcoderhtml/scaffold/releases/download/v0.0.3/app.ipa
+
+      - name: 📦 Upload ipa to TestFlight
+        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f ./builds/build.ipa
