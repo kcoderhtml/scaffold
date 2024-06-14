@@ -19,8 +19,6 @@ export default function Home() {
 			if (allImages) {
 				const images = JSON.parse(allImages);
 				setCardData(images); // Update state with fetched data
-			} else {
-				alert("You have no images saved.");
 			}
 		};
 
@@ -36,7 +34,6 @@ export default function Home() {
 			setCardData(images);
 			setRefreshing(false); // Hide refresh indicator
 		} else {
-			alert("You have no images saved.");
 			setRefreshing(false); // Hide refresh indicator
 		}
 	};
@@ -83,6 +80,13 @@ export default function Home() {
 								onPress={() => removeItem(index)}
 							/>
 						))}
+					</View>
+					<View className="flex-1 items-center justify-center">
+						{cardData.length === 0 && (
+							<Text className="text-xl text-slate-500 dark:text-slate-300 p-4">
+								No images were found
+							</Text>
+						)}
 					</View>
 				</View>
 			</ScrollView>
