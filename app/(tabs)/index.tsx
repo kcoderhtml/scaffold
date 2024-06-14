@@ -49,8 +49,13 @@ export default function Home() {
 		}
 	};
 
-	const filterbyTag = (tag: string) => {
-		const filteredData = cardData.filter((data) => data.tags.includes(tag));
+	const filterbyTag = async (tag: string) => {
+		const allImages = await AsyncStorage.getItem("images");
+		const cardData = JSON.parse(allImages || "[]");
+
+		const filteredData = cardData.filter((data: any) =>
+			data.tags.includes(tag)
+		);
 		setCardData(filteredData);
 		setFilter(tag);
 	};
@@ -63,7 +68,10 @@ export default function Home() {
 				refreshControl={
 					<RefreshControl
 						refreshing={refreshing} // Show refresh indicator while fetching
-						onRefresh={fetchData} // Function to call on pull down
+						onRefresh={() => {
+							setFilter(null);
+							fetchData();
+						}} // Function to call on pull down
 					/>
 				}
 			>
