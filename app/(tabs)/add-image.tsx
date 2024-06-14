@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import * as SecureStore from "expo-secure-store";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { JSHash, CONSTANTS } from "react-native-hash";
 
 import * as ExpoFileSystem from "expo-file-system";
 
@@ -35,8 +36,6 @@ async function describeImage(model: any, asset: any) {
 	]);
 	const response = await aiResult.response;
 	const analysis = response.text();
-
-	console.log(analysis);
 
 	const analysisObject = JSON.parse(analysis);
 
@@ -66,61 +65,56 @@ export default function ImagePickerExample() {
 			const genAI = new GoogleGenerativeAI(apiKey!);
 			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-			if (allImages) {
-				const images = JSON.parse(allImages);
+			const images = JSON.parse(allImages || "[]");
+			const id = await JSHash(
+				result.assets[0].uri,
+				CONSTANTS.HashAlgorithms.sha256
+			);
 
-				try {
-					if (!apiKey) {
-						throw new Error("No API key found.");
-					}
+			images.push({
+				id,
+				uri: result.assets[0].uri,
+				title: "",
+				description: "",
+			});
 
-					const analysisObject = await describeImage(model, result.assets[0]);
+			await AsyncStorage.setItem("images", JSON.stringify(images));
 
-					images.push({
-						uri: result.assets[0].uri,
-						title: analysisObject.title,
-						description: analysisObject.description,
-					});
-				} catch (e) {
-					console.error(e);
-					images.push({
-						uri: result.assets[0].uri,
-						title: "",
-						description: "",
-					});
+			try {
+				if (!apiKey) {
+					throw new Error("No API key found.");
 				}
 
-				await AsyncStorage.setItem("images", JSON.stringify(images));
-			} else {
-				try {
-					if (!apiKey) {
-						throw new Error("No API key found.");
-					}
+				console.log("Image analysis started: ", id);
+
+				setTimeout(async () => {
 					const analysisObject = await describeImage(model, result.assets[0]);
 
-					await AsyncStorage.setItem(
-						"images",
-						JSON.stringify([
-							{
-								uri: result.assets[0].uri,
+					const allImages = await AsyncStorage.getItem("images");
+					const images: {
+						id: string;
+						uri: string;
+						title: string;
+						description: string;
+					}[] = JSON.parse(allImages!);
+
+					const newImages = images.map((image) => {
+						if (image.id === id) {
+							return {
+								...image,
 								title: analysisObject.title,
 								description: analysisObject.description,
-							},
-						])
-					);
-				} catch (e) {
-					console.error(e);
-					await AsyncStorage.setItem(
-						"images",
-						JSON.stringify([
-							{
-								uri: result.assets[0].uri,
-								title: "",
-								description: "",
-							},
-						])
-					);
-				}
+							};
+						} else {
+							return image;
+						}
+					});
+
+					await AsyncStorage.setItem("images", JSON.stringify(newImages));
+					console.log("Image analysis complete: ", analysisObject.title);
+				}, 0);
+			} catch (e) {
+				console.error(e);
 			}
 		} else {
 			alert("You did not select any image.");
