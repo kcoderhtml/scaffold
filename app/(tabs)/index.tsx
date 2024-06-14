@@ -65,9 +65,9 @@ export default function Home() {
 						Welcome to Scaffold 🚀
 					</Text>
 
-					<Text className="text-slate-900 dark:text-slate-50 p-4">
-						Your mind is a garden, your thoughts are the seeds; you can grow
-						flowers, or you can grow weeds.
+					<Text className="text-slate-900 dark:text-slate-50 p-4 italic">
+						"Your Mind is a Garden, Your Thoughts are the Seeds. You can grow
+						Flowers or weeds..." ― Osho
 					</Text>
 
 					<View className="flex flex-wrap">
