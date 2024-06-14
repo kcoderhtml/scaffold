@@ -31,7 +31,7 @@ async function fileToGenerativePart(path: string, mimeType: string) {
 
 async function describeImage(model: any, asset: any) {
 	const aiResult = await model.generateContent([
-		'You are to analyze the content of this image and generate a short and conscise json object like the following {"title": "bowl of penne", "description": "a red bowl of penne pasta with pesto"}',
+		'You are to analyze the content of this image and generate a short and conscise json object like the following with no more than 5 tags {"title": "bowl of penne", "tags": ["red", "bowl", "penne", "pasta", "food"]}.',
 		await fileToGenerativePart(asset.uri, asset.mimeType!),
 	]);
 	const response = await aiResult.response;
@@ -79,7 +79,7 @@ export default function ImagePickerPage() {
 				id,
 				uri: result.assets[0].uri,
 				title: "",
-				description: "",
+				tags: [],
 			});
 
 			await AsyncStorage.setItem("images", JSON.stringify(images));
@@ -99,7 +99,7 @@ export default function ImagePickerPage() {
 						id: string;
 						uri: string;
 						title: string;
-						description: string;
+						tags: string[];
 					}[] = JSON.parse(allImages!);
 
 					const newImages = images.map((image) => {
@@ -107,7 +107,7 @@ export default function ImagePickerPage() {
 							return {
 								...image,
 								title: analysisObject.title,
-								description: analysisObject.description,
+								tags: analysisObject.tags,
 							};
 						} else {
 							return image;

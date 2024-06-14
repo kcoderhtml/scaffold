@@ -6,11 +6,18 @@ import * as Haptics from "expo-haptics";
 interface CardProps {
 	image?: string;
 	title: string;
-	description: string;
+	description?: string;
+	tags?: string[];
 	onPress?: () => void;
 }
 
-const Card: React.FC<CardProps> = ({ image, title, description, onPress }) => {
+const Card: React.FC<CardProps> = ({
+	image,
+	title,
+	description,
+	tags,
+	onPress,
+}) => {
 	const scale = useRef(new Animated.Value(1)).current;
 	const [critPressed, setCritPressed] = useState(false);
 	const pressStart = useRef(0);
@@ -84,10 +91,24 @@ const Card: React.FC<CardProps> = ({ image, title, description, onPress }) => {
 							{title}
 						</Text>
 					)}
-					{description !== "" && (
+					{description && description !== "" && (
 						<Text className="text-slate-900 dark:text-slate-50 pl-2 pr-2 pb-2 text-center">
 							{description}
 						</Text>
+					)}
+					{tags && tags.length > 0 && (
+						<View className="flex flex-row flex-wrap justify-center">
+							{tags.map((tag, index) => (
+								<View
+									key={index}
+									className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1"
+								>
+									<Text className="text-slate-900 dark:text-slate-50">
+										{tag}
+									</Text>
+								</View>
+							))}
+						</View>
 					)}
 				</View>
 			</Animated.View>

@@ -9,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
 	const [cardData, setCardData] = React.useState<
-		{ uri: string; title: string; description: string }[]
+		{ uri: string; title: string; tags: string[] }[]
 	>([]); // State for card data
 	const [refreshing, setRefreshing] = React.useState(false); // State for refresh indicator
 
@@ -76,7 +76,7 @@ export default function Home() {
 								key={index}
 								image={data.uri}
 								title={data.title}
-								description={data.description}
+								tags={data.tags}
 								onPress={() => removeItem(index)}
 							/>
 						))}
