@@ -17,4 +17,4 @@ jobs:
         run: wget https://github.com/kcoderhtml/scaffold/releases/download/v0.0.3/app.ipa
 
       - name: 📦 Upload ipa to TestFlight
-        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f ./builds/build.ipa
+        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f app.ipa
