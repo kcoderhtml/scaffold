@@ -5,7 +5,7 @@ permissions:
 name: iOS upload
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: 🏗 Setup bun
         uses: oven-sh/setup-bun@v1
