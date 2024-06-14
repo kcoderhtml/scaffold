@@ -13,8 +13,11 @@ jobs:
       - name: 🏗 Install ios-uploader
         run: bun install -g ios-uploader
 
+      - name: get latest tag
+        run: latest_tag=$(curl -sI https://github.com/markvincze/golang-build-test/releases/latest | grep -i location | awk -F'/' '{print $NF}')
+
       - name: download file
-        run: wget https://github.com/kcoderhtml/scaffold/releases/download/v0.0.3/app.ipa
+        run: wget https://github.com/kcoderhtml/scaffold/releases/download/${{ latest_tag }}/app.ipa
 
       - name: 📦 Upload ipa to TestFlight
         run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f app.ipa
