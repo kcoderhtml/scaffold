@@ -9,6 +9,7 @@ interface CardProps {
 	description?: string;
 	tags?: string[];
 	onPress?: () => void;
+	onTagPress?: (tag: string) => void;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -17,6 +18,7 @@ const Card: React.FC<CardProps> = ({
 	description,
 	tags,
 	onPress,
+	onTagPress,
 }) => {
 	const scale = useRef(new Animated.Value(1)).current;
 	const [critPressed, setCritPressed] = useState(false);
@@ -99,14 +101,22 @@ const Card: React.FC<CardProps> = ({
 					{tags && tags.length > 0 && (
 						<View className="flex flex-row flex-wrap justify-center">
 							{tags.map((tag, index) => (
-								<View
-									key={index}
-									className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1"
+								<Pressable
+									onPress={() => {
+										if (onTagPress) {
+											onTagPress(tag);
+										}
+									}}
 								>
-									<Text className="text-slate-900 dark:text-slate-50">
-										{tag}
-									</Text>
-								</View>
+									<View
+										key={index}
+										className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1"
+									>
+										<Text className="text-slate-900 dark:text-slate-50">
+											{tag}
+										</Text>
+									</View>
+								</Pressable>
 							))}
 						</View>
 					)}

@@ -12,6 +12,7 @@ export default function Home() {
 		{ uri: string; title: string; tags: string[] }[]
 	>([]); // State for card data
 	const [refreshing, setRefreshing] = React.useState(false); // State for refresh indicator
+	const [filter, setFilter] = React.useState<string | null>(null); // State for filter
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -48,6 +49,12 @@ export default function Home() {
 		}
 	};
 
+	const filterbyTag = (tag: string) => {
+		const filteredData = cardData.filter((data) => data.tags.includes(tag));
+		setCardData(filteredData);
+		setFilter(tag);
+	};
+
 	return (
 		<SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-700">
 			<ScrollView
@@ -70,6 +77,17 @@ export default function Home() {
 						Flowers or weeds..." ― Osho
 					</Text>
 
+					{filter && (
+						<View className="flex flex-row items-center justify-center bg-slate-500 dark:bg-slate-600 p-1.5 pl-3 pr-3 mb-3 rounded-full">
+							<Text className="text-xl font-bold text-slate-900 dark:text-slate-50">
+								Filtering by tag:{" "}
+							</Text>
+							<Text className="text-lg font-serif text-slate-900 dark:text-slate-50 italic">
+								{filter}
+							</Text>
+						</View>
+					)}
+
 					<View className="flex flex-wrap">
 						{cardData.map((data, index) => (
 							<Card
@@ -78,6 +96,7 @@ export default function Home() {
 								title={data.title}
 								tags={data.tags}
 								onPress={() => removeItem(index)}
+								onTagPress={(tag) => filterbyTag(tag)}
 							/>
 						))}
 					</View>
