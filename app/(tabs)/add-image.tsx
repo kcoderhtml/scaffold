@@ -42,8 +42,12 @@ async function describeImage(model: any, asset: any) {
 	return analysisObject;
 }
 
-export default function ImagePickerExample() {
+export default function ImagePickerPage() {
 	const [apiKey, setApiKey] = React.useState<string | null>(null); // State for API key
+	const [message, setMessage] = React.useState<{
+		message: string;
+		ok: boolean;
+	} | null>(null); // State for message
 
 	React.useEffect(() => {
 		const getApiKey = async () => {
@@ -113,21 +117,21 @@ export default function ImagePickerExample() {
 					await AsyncStorage.setItem("images", JSON.stringify(newImages));
 					console.log("Image analysis complete: ", analysisObject.title);
 				}, 0);
+
+				setMessage({ message: "Image added successfully!", ok: true });
 			} catch (e) {
-				console.error(e);
+				if (e instanceof Error) {
+					console.error(e);
+					setMessage({ message: e.message, ok: false });
+				}
 			}
 		} else {
-			alert("You did not select any image.");
+			setMessage({ message: "Image selection cancelled.", ok: false });
 		}
 	};
 
-	const clearImages = async () => {
-		await AsyncStorage.removeItem("images");
-		alert("All images have been removed.");
-	};
-
 	return (
-		<SafeAreaView className="flex-1 items-center bg-slate-50 dark:bg-slate-700">
+		<SafeAreaView className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
 			<Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
 				Select an Image to add to your collection! 📸
 			</Text>
@@ -141,14 +145,15 @@ export default function ImagePickerExample() {
 				</Text>
 			</Pressable>
 
-			<Pressable
-				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
-				onPress={clearImages}
-			>
-				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
-					Clear All Images
+			{message && (
+				<Text
+					className={`text-xl text-center font-bold mt-8 ${
+						message.ok ? "text-green-500" : "text-red-500"
+					}`}
+				>
+					{message.message}
 				</Text>
-			</Pressable>
+			)}
 		</SafeAreaView>
 	);
 }

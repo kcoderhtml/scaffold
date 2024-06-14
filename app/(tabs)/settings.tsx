@@ -3,28 +3,56 @@ import { Text, TextInput, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import * as SecureStore from "expo-secure-store";
-
-async function save(key: string, value: string) {
-	await SecureStore.setItemAsync(key, value);
-}
-
-async function getValueFor(key: string) {
-	let result = await SecureStore.getItemAsync(key);
-	if (result) {
-		alert("🔐 Here's your value 🔐 \n" + result);
-	} else {
-		alert("No values stored under that key.");
-	}
-}
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Settings() {
+	const [message, setMessage] = React.useState<{
+		message: string;
+		ok: boolean;
+	} | null>(null); // State for message
+
+	async function save(key: string, value: string) {
+		if (!value || value === "") {
+			setMessage({
+				message: "Value cannot be empty",
+				ok: false,
+			});
+			return;
+		}
+		await SecureStore.setItemAsync(key, value);
+		setMessage({
+			message: "Value stored successfully!",
+			ok: true,
+		});
+	}
+
+	async function getValueFor(key: string) {
+		let result = await SecureStore.getItemAsync(key);
+		if (result) {
+			alert("🔐 Here's your value 🔐 \n" + result);
+		} else {
+			setMessage({
+				message: "No value stored for this key",
+				ok: false,
+			});
+		}
+	}
+
+	async function clearImages() {
+		await AsyncStorage.removeItem("images");
+		setMessage({
+			message: "Cleared all images!",
+			ok: true,
+		});
+	}
+
 	return (
 		<SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700">
 			<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
 				Welcome to the Settings Menu!
 			</Text>
 
-			<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+			<Text className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-8">
 				🔐 Enter your Gemini API key 🔐
 			</Text>
 			<TextInput
@@ -44,6 +72,29 @@ export default function Settings() {
 					Check Gemini API Key
 				</Text>
 			</Pressable>
+
+			<Text className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-16">
+				⚠️ Danger Zone ⚠️
+			</Text>
+
+			<Pressable
+				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
+				onPress={clearImages}
+			>
+				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+					Clear All Images
+				</Text>
+			</Pressable>
+
+			{message && (
+				<Text
+					className={`text-xl text-center font-bold mt-8 ${
+						message.ok ? "text-green-500" : "text-red-500"
+					}`}
+				>
+					{message.message}
+				</Text>
+			)}
 		</SafeAreaView>
 	);
 }
