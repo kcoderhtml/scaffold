@@ -1,7 +1,8 @@
 import { Link, Stack } from "expo-router";
 
 import React from "react";
-import { Text, View, Pressable } from "react-native";
+import { Text, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useColorScheme } from "react-native";
 import colors from "tailwindcss/colors";
@@ -15,7 +16,7 @@ export default function NotFoundScreen() {
 		colorScheme === "dark" ? colors.slate[200] : colors.slate[900];
 
 	return (
-		<View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700">
+		<SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700">
 			<Stack.Screen
 				options={{
 					title: "Oops!",
@@ -38,6 +39,6 @@ export default function NotFoundScreen() {
 					</Text>
 				</Pressable>
 			</Link>
-		</View>
+		</SafeAreaView>
 	);
 }

@@ -1,5 +1,6 @@
 import React from "react";
-import { Text, View, TextInput, Pressable } from "react-native";
+import { Text, TextInput, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -18,7 +19,7 @@ async function getValueFor(key: string) {
 
 export default function Settings() {
 	return (
-		<View className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700">
+		<SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700">
 			<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
 				Welcome to the Settings Menu!
 			</Text>
@@ -43,6 +44,6 @@ export default function Settings() {
 					Check Gemini API Key
 				</Text>
 			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }

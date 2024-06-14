@@ -1,5 +1,7 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 import React from "react";
+
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -131,8 +133,8 @@ export default function ImagePickerExample() {
 	};
 
 	return (
-		<View className="flex-1 items-center bg-slate-50 dark:bg-slate-700">
-			<Text className="text-xl text-center font-bold m-16 text-slate-900 dark:text-slate-50">
+		<SafeAreaView className="flex-1 items-center bg-slate-50 dark:bg-slate-700">
+			<Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
 				Select an Image to add to your collection! 📸
 			</Text>
 
@@ -153,6 +155,6 @@ export default function ImagePickerExample() {
 					Clear All Images
 				</Text>
 			</Pressable>
-		</View>
+		</SafeAreaView>
 	);
 }

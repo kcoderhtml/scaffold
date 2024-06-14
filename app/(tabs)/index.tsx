@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Text, View, ScrollView, RefreshControl } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import Card from "../../components/card";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -50,7 +52,7 @@ export default function Home() {
 	};
 
 	return (
-		<View className="flex-1 bg-slate-50 dark:bg-slate-700">
+		<SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-700">
 			<ScrollView
 				contentContainerStyle={{ flexGrow: 1 }}
 				overScrollMode="never"
@@ -62,7 +64,7 @@ export default function Home() {
 				}
 			>
 				<View className="flex-1 items-center">
-					<Text className="text-2xl font-bold mt-12 text-slate-900 dark:text-slate-50">
+					<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
 						Welcome to Scaffold 🚀
 					</Text>
 
@@ -84,6 +86,6 @@ export default function Home() {
 					</View>
 				</View>
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 }
