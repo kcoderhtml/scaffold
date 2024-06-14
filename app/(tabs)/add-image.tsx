@@ -7,7 +7,7 @@ import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import * as SecureStore from "expo-secure-store";
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 import * as ExpoFileSystem from "expo-file-system";
 
@@ -63,7 +63,7 @@ export default function ImagePickerExample() {
 		if (!result.canceled) {
 			const allImages = await AsyncStorage.getItem("images");
 
-			const genAI = new GoogleGenerativeAI(apiKey);
+			const genAI = new GoogleGenerativeAI(apiKey!);
 			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 			if (allImages) {
