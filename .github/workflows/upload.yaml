@@ -14,7 +14,7 @@ jobs:
         run: bun install -g ios-uploader
 
       - name: get latest tag
-        run: latest_tag=$(curl -sI https://github.com/kcoderhtml/scaffold/releases/latest | grep -i location | awk -F'/' '{print $NF}')
+        run: echo "latest_tag=$(curl -sI https://github.com/kcoderhtml/scaffold/releases/latest | grep -i location | awk -F'/' '{print $NF}')" >> $GITHUB_ENV
 
       - name: download file
         run: wget https://github.com/kcoderhtml/scaffold/releases/download/${{ env.latest_tag }}/app.ipa
