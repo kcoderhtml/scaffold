@@ -40,4 +40,4 @@ jobs:
         run: bun install -g ios-uploader
 
       - name: 📦 Upload ipa to TestFlight
-        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -b ./builds/build.ipa
+        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f ./builds/build.ipa
