@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Text, View, ScrollView, RefreshControl } from "react-native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Card from "../../components/card";
 
@@ -60,8 +60,13 @@ export default function Home() {
 		setFilter(tag);
 	};
 
+	const insets = useSafeAreaInsets();
+
 	return (
-		<SafeAreaView className="flex-1 bg-slate-50 dark:bg-slate-700">
+		<View
+			className="flex-1 bg-slate-50 dark:bg-slate-700"
+			style={{ paddingTop: insets.top }}
+		>
 			<ScrollView
 				contentContainerStyle={{ flexGrow: 1 }}
 				overScrollMode="never"
@@ -117,6 +122,6 @@ export default function Home() {
 					</View>
 				</View>
 			</ScrollView>
-		</SafeAreaView>
+		</View>
 	);
 }

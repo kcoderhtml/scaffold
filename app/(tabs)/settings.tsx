@@ -1,6 +1,6 @@
 import React from "react";
-import { Text, TextInput, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, TextInput, Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -46,8 +46,13 @@ export default function Settings() {
 		});
 	}
 
+	const insets = useSafeAreaInsets();
+
 	return (
-		<SafeAreaView className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700">
+		<View
+			className="flex-1 items-center justify-center bg-slate-50 dark:bg-slate-700"
+			style={{ paddingTop: insets.top }}
+		>
 			<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
 				Welcome to the Settings Menu!
 			</Text>
@@ -95,6 +100,6 @@ export default function Settings() {
 					{message.message}
 				</Text>
 			)}
-		</SafeAreaView>
+		</View>
 	);
 }
