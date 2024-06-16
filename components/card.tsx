@@ -107,6 +107,7 @@ const Card: React.FC<CardProps> = ({
 											onTagPress(tag);
 										}
 									}}
+									key={index}
 								>
 									<View
 										key={index}
