@@ -26,16 +26,19 @@ export default function Settings() {
 		});
 	}
 
-	async function getValueFor(key: string) {
-		let result = await SecureStore.getItemAsync(key);
-		if (result) {
-			alert("🔐 Here's your value 🔐 \n" + result);
-		} else {
-			setMessage({
-				message: "No value stored for this key",
-				ok: false,
-			});
-		}
+	async function getAllValues(keys: string[]) {
+		const values = await Promise.all(
+			keys.map(async (key) => {
+				const value = await SecureStore.getItemAsync(key);
+				return { key, value };
+			})
+		);
+
+		const alertText = values
+			.map((value) => `${value.key}: ${value.value}`)
+			.join("\n");
+
+		alert(alertText);
 	}
 
 	async function clearImages() {
@@ -44,6 +47,65 @@ export default function Settings() {
 			message: "Cleared all images!",
 			ok: true,
 		});
+	}
+
+	async function uploadImages() {
+		const images = await AsyncStorage.getItem("images");
+		if (images) {
+			const parsedImages = JSON.parse(images);
+			const cloudToken = await SecureStore.getItemAsync("CLOUD_TOKEN");
+			const cloudUrl = new URL(
+				(await SecureStore.getItemAsync("CLOUD_URL")) as string
+			);
+
+			if (!cloudToken || !cloudUrl) {
+				setMessage({
+					message: "Cloud token or url not found",
+					ok: false,
+				});
+				return;
+			}
+
+			setMessage({
+				message: "Uploading images to the cloud...",
+				ok: true,
+			});
+
+			const promises = parsedImages.map(async (image: any) => {
+				const response = await fetch(cloudUrl.origin + "/insert", {
+					method: "POST",
+					headers: {
+						Authorization: cloudToken,
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						uri: image.uri,
+						title: image.title,
+						tags: image.tags,
+					}),
+				});
+
+				if (!response.ok) {
+					throw new Error("Failed to upload image");
+				}
+
+				console.log(await response.json());
+			});
+
+			setTimeout(async () => {
+				await Promise.all(promises);
+
+				setMessage({
+					message: "Uploaded all images to the cloud!",
+					ok: true,
+				});
+			}, 0);
+		} else {
+			setMessage({
+				message: "No images to upload",
+				ok: false,
+			});
+		}
 	}
 
 	const insets = useSafeAreaInsets();
@@ -58,7 +120,7 @@ export default function Settings() {
 			</Text>
 
 			<Text className="text-xl font-bold text-slate-900 dark:text-slate-200 mt-8">
-				🔐 Enter your Gemini API key 🔐
+				🔐 API keys 🔐
 			</Text>
 			<TextInput
 				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg text-slate-900 dark:text-slate-200 w-9/12"
@@ -69,12 +131,28 @@ export default function Settings() {
 				secureTextEntry={true}
 			/>
 
+			<TextInput
+				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg text-slate-900 dark:text-slate-200 w-9/12"
+				placeholder="Enter your Cloud token"
+				onSubmitEditing={(event) => save("CLOUD_TOKEN", event.nativeEvent.text)}
+				secureTextEntry={true}
+			/>
+
+			<TextInput
+				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg text-slate-900 dark:text-slate-200 w-9/12"
+				placeholder="Enter your Cloud url"
+				onSubmitEditing={(event) => save("CLOUD_URL", event.nativeEvent.text)}
+				secureTextEntry={false}
+			/>
+
 			<Pressable
 				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
-				onPress={() => getValueFor("GEMINI_API_KEY")}
+				onPress={() =>
+					getAllValues(["GEMINI_API_KEY", "CLOUD_TOKEN", "CLOUD_URL"])
+				}
 			>
 				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
-					Check Gemini API Key
+					Check Secure Storage
 				</Text>
 			</Pressable>
 
@@ -88,6 +166,15 @@ export default function Settings() {
 			>
 				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
 					Clear All Images
+				</Text>
+			</Pressable>
+
+			<Pressable
+				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
+				onPress={() => uploadImages()}
+			>
+				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+					Upload all images to the cloud
 				</Text>
 			</Pressable>
 
