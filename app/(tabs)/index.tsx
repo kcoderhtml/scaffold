@@ -1,11 +1,18 @@
 import React, { useEffect } from "react";
-import { Text, View, ScrollView, RefreshControl } from "react-native";
+import {
+	Text,
+	View,
+	ScrollView,
+	RefreshControl,
+	TextInput,
+} from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import Card from "../../components/card";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 export default function Home() {
 	const [cardData, setCardData] = React.useState<
@@ -60,6 +67,50 @@ export default function Home() {
 		setFilter(tag);
 	};
 
+	const search = async (query: string) => {
+		const cloudToken = await SecureStore.getItemAsync("CLOUD_TOKEN");
+		const cloudUrl = await SecureStore.getItemAsync("CLOUD_URL");
+
+		if (!cloudToken || !cloudUrl) {
+			alert("Cloud token or url not found");
+			return;
+		}
+
+		if (!query) {
+			fetchData();
+			return;
+		}
+
+		setTimeout(async () => {
+			const response = await fetch(new URL(cloudUrl).origin + "/query", {
+				method: "POST",
+				headers: {
+					Authorization: cloudToken,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					query,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to upload image");
+			}
+
+			const data = await response.json();
+			console.log(data);
+
+			if (data.error || data.length === 0) {
+				alert("No images found with the tag: " + query);
+				// refresh data
+				fetchData();
+				return;
+			}
+
+			setCardData(data);
+		}, 0);
+	};
+
 	const insets = useSafeAreaInsets();
 
 	return (
@@ -80,7 +131,7 @@ export default function Home() {
 					/>
 				}
 			>
-				<View className="flex-1 items-center">
+				<View className="flex-1 items-center justify-center">
 					<Text className="text-2xl font-bold text-slate-900 dark:text-slate-50">
 						Welcome to Scaffold 🚀
 					</Text>
@@ -89,6 +140,19 @@ export default function Home() {
 						"Your Mind is a Garden, Your Thoughts are the Seeds. You can grow
 						Flowers or weeds..." ― Osho
 					</Text>
+
+					<View className="flex flex-row items-center justify-center bg-slate-500 dark:bg-slate-600 p-1.5 pl-3 pr-3 mb-3 rounded-full">
+						<Text className="text-xl font-bold text-slate-900 dark:text-slate-50">
+							Filtering by tag:{" "}
+						</Text>
+						<TextInput
+							className="text-sm font-serif text-slate-900 dark:text-slate-50 italic bg-slate-400 dark:bg-slate-500 pl-2 pr-2 rounded-lg h-full"
+							placeholder="red shoes"
+							onSubmitEditing={async (event) =>
+								await search(event.nativeEvent.text)
+							}
+						/>
+					</View>
 
 					{filter && (
 						<View className="flex flex-row items-center justify-center bg-slate-500 dark:bg-slate-600 p-1.5 pl-3 pr-3 mb-3 rounded-full">
