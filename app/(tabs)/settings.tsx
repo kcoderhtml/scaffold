@@ -60,6 +60,7 @@ export default function Settings() {
 							uri: string;
 							needsSyncing?: boolean;
 							cloudID?: string;
+							id: string;
 						}
 				  ]
 				| [] = JSON.parse(images);
@@ -148,12 +149,15 @@ export default function Settings() {
 							uri: string;
 							needsSyncing?: boolean;
 							cloudID?: string;
+							id: string;
 						}
 					] = JSON.parse(storedImages);
 
-					// filter out the values that are null
+					// filter out the images with the same id
 					const oldImages = parsedStoredImages.filter((storedImage) => {
-						return !parsedImages.some((image) => image.uri === storedImage.uri);
+						return !newImages.some(
+							(newImage) => newImage.id === storedImage.id
+						);
 					});
 
 					newImages.push(...oldImages);
