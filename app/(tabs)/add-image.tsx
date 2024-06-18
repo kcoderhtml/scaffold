@@ -79,7 +79,7 @@ export default function ImagePickerPage() {
 				id,
 				uri: result.assets[0].uri,
 				title: "",
-				tags: [],
+				tags: ["needs tagging"],
 			});
 
 			await AsyncStorage.setItem("images", JSON.stringify(images));
