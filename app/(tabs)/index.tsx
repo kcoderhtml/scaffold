@@ -172,7 +172,7 @@ export default function Home() {
 								image={data.uri}
 								title={data.title}
 								tags={data.tags}
-								inCloud={data.needsSyncing !== undefined && !data.needsSyncing}
+								needsSyncing={data.needsSyncing}
 								onPress={() => removeItem(index)}
 								onTagPress={(tag) => filterbyTag(tag)}
 							/>
