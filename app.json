@@ -1,8 +1,8 @@
 {
 	"expo": {
-		"name": "Sk4ph; memoir for your mind",
+		"name": "Sk4ph",
 		"slug": "sk4ph",
-		"version": "0.0.3",
+		"version": "0.1.0",
 		"orientation": "portrait",
 		"icon": "./assets/images/icon.png",
 		"scheme": "myapp",
