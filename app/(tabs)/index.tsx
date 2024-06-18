@@ -52,6 +52,7 @@ export default function Home() {
 			const images = JSON.parse(allImages);
 			images.splice(index, 1);
 			await AsyncStorage.setItem("images", JSON.stringify(images));
+			setFilter(null);
 			setCardData(images);
 		}
 	};
@@ -143,7 +144,7 @@ export default function Home() {
 
 					<View className="flex flex-row items-center justify-center bg-slate-500 dark:bg-slate-600 p-1.5 pl-3 pr-3 mb-3 rounded-full">
 						<Text className="text-xl font-bold text-slate-900 dark:text-slate-50">
-							Filtering by tag:{" "}
+							Search for an image:{" "}
 						</Text>
 						<TextInput
 							className="text-sm font-serif text-slate-900 dark:text-slate-50 italic bg-slate-400 dark:bg-slate-500 pl-2 pr-2 rounded-lg h-full"
@@ -155,11 +156,11 @@ export default function Home() {
 					</View>
 
 					{filter && (
-						<View className="flex flex-row items-center justify-center bg-slate-500 dark:bg-slate-600 p-1.5 pl-3 pr-3 mb-3 rounded-full">
-							<Text className="text-xl font-bold text-slate-900 dark:text-slate-50">
+						<View className="flex flex-row items-center justify-center bg-slate-500 dark:bg-slate-600 p-0.5 pl-3 pr-3 mb-3 rounded-full">
+							<Text className="text-base font-bold text-slate-900 dark:text-slate-200">
 								Filtering by tag:{" "}
 							</Text>
-							<Text className="text-lg font-serif text-slate-900 dark:text-slate-50 italic">
+							<Text className="text-sm font-serif text-slate-900 dark:text-slate-200 italic">
 								{filter}
 							</Text>
 						</View>
