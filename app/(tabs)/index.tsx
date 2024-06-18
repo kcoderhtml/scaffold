@@ -16,7 +16,7 @@ import * as SecureStore from "expo-secure-store";
 
 export default function Home() {
 	const [cardData, setCardData] = React.useState<
-		{ uri: string; title: string; tags: string[] }[]
+		{ uri: string; title: string; tags: string[]; needsSyncing?: boolean }[]
 	>([]); // State for card data
 	const [refreshing, setRefreshing] = React.useState(false); // State for refresh indicator
 	const [filter, setFilter] = React.useState<string | null>(null); // State for filter
@@ -172,6 +172,7 @@ export default function Home() {
 								image={data.uri}
 								title={data.title}
 								tags={data.tags}
+								inCloud={data.needsSyncing !== undefined && !data.needsSyncing}
 								onPress={() => removeItem(index)}
 								onTagPress={(tag) => filterbyTag(tag)}
 							/>

@@ -1,5 +1,6 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Text, View, Image, Pressable, Animated } from "react-native";
+import { Entypo } from "@expo/vector-icons";
 
 import * as Haptics from "expo-haptics";
 
@@ -8,6 +9,7 @@ interface CardProps {
 	title: string;
 	description?: string;
 	tags?: string[];
+	inCloud?: boolean;
 	onPress?: () => void;
 	onTagPress?: (tag: string) => void;
 }
@@ -17,6 +19,7 @@ const Card: React.FC<CardProps> = ({
 	title,
 	description,
 	tags,
+	inCloud,
 	onPress,
 	onTagPress,
 }) => {
@@ -119,6 +122,11 @@ const Card: React.FC<CardProps> = ({
 									</View>
 								</Pressable>
 							))}
+							{inCloud && (
+								<View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
+									<Entypo name="cloud" size={24} color="white" />
+								</View>
+							)}
 						</View>
 					)}
 				</View>
