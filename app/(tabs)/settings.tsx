@@ -42,11 +42,77 @@ export default function Settings() {
 	}
 
 	async function clearImages() {
-		await AsyncStorage.removeItem("images");
-		setMessage({
-			message: "Cleared all images!",
-			ok: true,
-		});
+		const allImages = await AsyncStorage.getItem("images");
+		if (allImages) {
+			const parsedImages: [
+				{
+					title: string;
+					tags: string[];
+					uri: string;
+					needsSyncing?: boolean;
+					cloudID: string;
+				}
+			] = JSON.parse(allImages);
+
+			try {
+				const toRemoveFromCloud = parsedImages.filter((image) => image.cloudID);
+
+				if (toRemoveFromCloud.length > 0) {
+					const cloudToken = await SecureStore.getItemAsync("CLOUD_TOKEN");
+					const cloudUrl = new URL(
+						(await SecureStore.getItemAsync("CLOUD_URL")) as string
+					);
+
+					if (!cloudToken || !cloudUrl) {
+						alert("Cloud token or url not found");
+						return;
+					}
+
+					const promises = toRemoveFromCloud.map(async (image) => {
+						try {
+							const response = await fetch(cloudUrl.origin + "/remove", {
+								method: "POST",
+								headers: {
+									Authorization: cloudToken,
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify({
+									id: image.cloudID,
+								}),
+							});
+						} catch (e) {
+							if (e instanceof Error) {
+								if (e.message === "Failed to remove image from cloud") {
+									alert("Failed to remove image from cloud");
+								}
+							}
+						}
+					});
+
+					setTimeout(async () => {
+						await Promise.all(promises);
+						await AsyncStorage.removeItem("images");
+
+						setMessage({
+							message: "Cleared all images!",
+							ok: true,
+						});
+					}, 0);
+				}
+			} catch (e) {
+				if (e instanceof Error) {
+					if (e.message === "Failed to remove image from cloud") {
+						alert("Failed to remove image from cloud");
+						return;
+					}
+				}
+			}
+
+			await setMessage({
+				message: "Clearing Images...",
+				ok: true,
+			});
+		}
 	}
 
 	async function uploadImages() {
