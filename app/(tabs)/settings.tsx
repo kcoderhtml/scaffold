@@ -253,6 +253,39 @@ export default function Settings() {
 		}
 	}
 
+	async function checkCloudRemoteVersion(remote: string) {
+		const currentVersion = "0.2.0";
+		try {
+			const remoteURL = new URL(remote);
+
+			const response = await fetch(remoteURL.origin + "/version");
+			const responseJson = await response.json();
+
+			if (
+				!response.ok ||
+				responseJson.error !== undefined ||
+				!responseJson.version
+			) {
+				throw new Error("Failed to get remote version");
+			}
+
+			if (responseJson.version === currentVersion) {
+				return { valid: true };
+			} else {
+				throw new Error(
+					"Invalid remote version " +
+						responseJson.version +
+						" expected " +
+						currentVersion
+				);
+			}
+		} catch (e) {
+			if (e instanceof Error) {
+				return { valid: false, message: e.message };
+			}
+		}
+	}
+
 	const insets = useSafeAreaInsets();
 
 	return (
@@ -286,7 +319,15 @@ export default function Settings() {
 			<TextInput
 				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg text-slate-900 dark:text-slate-200 w-9/12"
 				placeholder="Enter your Cloud url"
-				onSubmitEditing={(event) => save("CLOUD_URL", event.nativeEvent.text)}
+				onSubmitEditing={async (event) => {
+					const text = event.nativeEvent.text;
+					const valid = await checkCloudRemoteVersion(text);
+					if (valid?.valid) {
+						save("CLOUD_URL", text);
+					} else {
+						alert(valid?.message || "Invalid remote version");
+					}
+				}}
 				secureTextEntry={false}
 			/>
 
