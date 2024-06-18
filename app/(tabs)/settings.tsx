@@ -52,9 +52,17 @@ export default function Settings() {
 	async function uploadImages() {
 		const images = await AsyncStorage.getItem("images");
 		if (images) {
-			const parsedImages: [
-				{ title: string; tags: string[]; uri: string; needsSyncing?: boolean }
-			] = JSON.parse(images);
+			const parsedImages:
+				| [
+						{
+							title: string;
+							tags: string[];
+							uri: string;
+							needsSyncing?: boolean;
+							cloudID?: string;
+						}
+				  ]
+				| [] = JSON.parse(images);
 			const cloudToken = await SecureStore.getItemAsync("CLOUD_TOKEN");
 			const cloudUrl = new URL(
 				(await SecureStore.getItemAsync("CLOUD_URL")) as string
@@ -73,9 +81,24 @@ export default function Settings() {
 				ok: true,
 			});
 
-			const promises = parsedImages
-				.filter((image) => image.needsSyncing === undefined)
-				.map(async (image: any) => {
+			const imagesToUpload = parsedImages.filter(
+				(image) =>
+					JSON.stringify(image.tags) !== JSON.stringify(["needs tagging"]) &&
+					image.needsSyncing === undefined &&
+					image.cloudID === undefined
+			);
+
+			if (!parsedImages || imagesToUpload.length === 0) {
+				console.log("No images to upload");
+				setMessage({
+					message: "No images to upload",
+					ok: false,
+				});
+				return;
+			}
+
+			const promises = imagesToUpload.map(async (image: any) => {
+				try {
 					const response = await fetch(cloudUrl.origin + "/insert", {
 						method: "POST",
 						headers: {
@@ -89,40 +112,51 @@ export default function Settings() {
 						}),
 					});
 
-					if (!response.ok) {
+					const responseJson = await response.json();
+
+					if (!response.ok || responseJson.error !== undefined) {
 						throw new Error("Failed to upload image");
 					}
 
-					console.log(await response.json());
-				});
+					return {
+						...image,
+						needsSyncing: false,
+						cloudID: responseJson.cloudID,
+					};
+				} catch (e) {
+					if (e instanceof Error) {
+						console.error(e);
+						setMessage({
+							message: e.message,
+							ok: false,
+						});
+					}
+				}
+			});
 
 			setTimeout(async () => {
-				await Promise.all(promises);
+				const newImages = await Promise.all(promises);
 
-				const newImages = parsedImages.map((image) => {
-					if (image.needsSyncing === undefined) {
-						return {
-							...image,
-							needsSyncing: false,
-						};
-					}
-					return image;
-				});
+				console.log("Images uploaded: ", newImages);
 
 				const storedImages = await AsyncStorage.getItem("images");
 				if (storedImages) {
-					const parsedStoredImages: [
+					let parsedStoredImages: [
 						{
 							title: string;
 							tags: string[];
 							uri: string;
 							needsSyncing?: boolean;
+							cloudID?: string;
 						}
 					] = JSON.parse(storedImages);
-					const newAddedImages = parsedStoredImages.filter((storedImage) => {
+
+					// filter out the values that are null
+					const oldImages = parsedStoredImages.filter((storedImage) => {
 						return !parsedImages.some((image) => image.uri === storedImage.uri);
 					});
-					newImages.push(...newAddedImages);
+
+					newImages.push(...oldImages);
 				}
 
 				await AsyncStorage.setItem("images", JSON.stringify(newImages));

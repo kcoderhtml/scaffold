@@ -49,11 +49,60 @@ export default function Home() {
 	const removeItem = async (index: number) => {
 		const allImages = await AsyncStorage.getItem("images");
 		if (allImages) {
-			const images = JSON.parse(allImages);
-			images.splice(index, 1);
-			await AsyncStorage.setItem("images", JSON.stringify(images));
-			setFilter(null);
-			setCardData(images);
+			const parsedImages: [
+				{
+					title: string;
+					tags: string[];
+					uri: string;
+					needsSyncing?: boolean;
+					cloudID: string;
+				}
+			] = JSON.parse(allImages);
+
+			try {
+				if (parsedImages[index].cloudID) {
+					const cloudToken = await SecureStore.getItemAsync("CLOUD_TOKEN");
+					const cloudUrl = new URL(
+						(await SecureStore.getItemAsync("CLOUD_URL")) as string
+					);
+
+					if (!cloudToken || !cloudUrl) {
+						alert("Cloud token or url not found");
+						return;
+					}
+
+					const response = await fetch(cloudUrl.origin + "/remove", {
+						method: "POST",
+						headers: {
+							Authorization: cloudToken,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							id: parsedImages[index].cloudID,
+						}),
+					});
+
+					const responseJson = await response.json();
+
+					if (!response.ok || responseJson.error !== undefined) {
+						throw new Error("Failed to remove image from cloud");
+					}
+				}
+				parsedImages.splice(index, 1);
+				await AsyncStorage.setItem("images", JSON.stringify(parsedImages));
+				setFilter(null);
+				setCardData(parsedImages);
+			} catch (e) {
+				if (e instanceof Error) {
+					if (e.message === "Failed to remove image from cloud") {
+						alert("Failed to remove image from cloud");
+						parsedImages.splice(index, 1);
+						await AsyncStorage.setItem("images", JSON.stringify(parsedImages));
+						setFilter(null);
+						setCardData(parsedImages);
+					}
+				}
+			}
 		}
 	};
 
