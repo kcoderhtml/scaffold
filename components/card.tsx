@@ -27,7 +27,7 @@ const Card: React.FC<CardProps> = ({
 	const scale = useRef(new Animated.Value(1)).current;
 	const [critPressed, setCritPressed] = useState(false);
 	const pressStart = useRef(0);
-	const holdDuration = 0.45;
+	const holdDuration = 0.18;
 
 	return (
 		<Pressable
@@ -37,7 +37,7 @@ const Card: React.FC<CardProps> = ({
 
 				// animate to smaller size
 				Animated.timing(scale, {
-					toValue: 0.95,
+					toValue: 0.975,
 					duration: holdDuration * 1000,
 					useNativeDriver: true,
 				}).start(({ finished }) => {
@@ -54,14 +54,14 @@ const Card: React.FC<CardProps> = ({
 					// if not, animate back to normal
 					Animated.timing(scale, {
 						toValue: 1,
-						duration: 100,
+						duration: holdDuration * 300,
 						useNativeDriver: true,
 					}).start();
 				} else {
 					// if it was, run the onPress function after animating to smaller size
 					Animated.timing(scale, {
-						toValue: 0.9,
-						duration: 100,
+						toValue: 0.98,
+						duration: holdDuration * 300,
 						useNativeDriver: true,
 					}).start(async ({ finished }) => {
 						// run onPress function after animation
