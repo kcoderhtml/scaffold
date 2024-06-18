@@ -117,7 +117,7 @@ const Card: React.FC<CardProps> = ({
 										key={index}
 										className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1"
 									>
-										<Text className="text-slate-900 dark:text-slate-50">
+										<Text className="text-sm text-slate-900 dark:text-slate-50">
 											{tag}
 										</Text>
 									</View>
@@ -135,7 +135,7 @@ const Card: React.FC<CardProps> = ({
 							)}
 							{needsSyncing === false && (
 								<View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
-									<AntDesign name="cloud" size={24} color="white" />
+									<AntDesign name="cloud" size={20} color="white" />
 								</View>
 							)}
 						</View>
