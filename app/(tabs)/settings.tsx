@@ -80,6 +80,15 @@ export default function Settings() {
 									id: image.cloudID,
 								}),
 							});
+
+							const responseJson = await response.json();
+
+							if (!response.ok || responseJson.error !== undefined) {
+								throw new Error(
+									"Failed to remove image from cloud: ",
+									responseJson.error
+								);
+							}
 						} catch (e) {
 							if (e instanceof Error) {
 								if (e.message === "Failed to remove image from cloud") {
