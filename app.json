@@ -17,7 +17,10 @@
 			"config": {
 				"usesNonExemptEncryption": false
 			},
-			"bundleIdentifier": "com.kieranklukas.sk4ph"
+			"bundleIdentifier": "com.kieranklukas.sk4ph",
+			"entitlements": {
+				"aps-environment": "development"
+			}
 		},
 		"android": {
 			"adaptiveIcon": {
