@@ -80,17 +80,21 @@ export default function ImagePickerPage() {
 				Filesystem.documentDirectory +
 				"images/" +
 				id +
+				"." +
 				result.assets[0].uri.split(".").pop();
 
-			console.log("Copied image to: ", newUri, " from: ", result.assets[0].uri);
-
 			try {
-				await Filesystem.copyAsync({
-					from: result.assets[0].uri,
-					to: newUri,
-				});
+				// make the images directory if it doesn't exist
+				await Filesystem.makeDirectoryAsync(
+					Filesystem.documentDirectory + "images",
+					{ intermediates: true }
+				);
+
+				await Filesystem.downloadAsync(result.assets[0].uri, newUri);
 			} catch (e) {
 				console.error(e);
+				setMessage({ message: "Failed to add image", ok: false });
+				return;
 			}
 
 			images.push({
