@@ -254,7 +254,7 @@ export default function Settings() {
 	}
 
 	async function checkCloudRemoteVersion(remote: string) {
-		const currentVersion = "0.2.0";
+		const currentVersion = "0.2.1";
 		try {
 			const remoteURL = new URL(remote);
 
