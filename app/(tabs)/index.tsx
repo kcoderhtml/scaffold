@@ -147,17 +147,25 @@ export default function Home() {
 				throw new Error("Failed to upload image");
 			}
 
-			const data = await response.json();
-			console.log(data);
+			const cloudData = await response.json();
 
-			if (data.error || data.length === 0) {
+			// filter the json data from the async storage
+			const allImages = await AsyncStorage.getItem("images");
+			const cardData = JSON.parse(allImages || "[]");
+
+			if (cloudData.error || cloudData.length === 0) {
 				alert("No images found with the tag: " + query);
 				// refresh data
 				fetchData();
 				return;
 			}
 
-			setCardData(data);
+			// filter only the images that have the Cloud ID
+			const filteredData = cardData.filter((data: any) =>
+				cloudData.find((image: any) => image.id === data.cloudID)
+			);
+
+			setCardData(filteredData);
 		}, 0);
 	};
 
