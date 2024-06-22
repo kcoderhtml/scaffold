@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Filesystem from "expo-file-system";
 
 import * as SecureStore from "expo-secure-store";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -75,9 +76,30 @@ export default function ImagePickerPage() {
 				CONSTANTS.HashAlgorithms.sha256
 			);
 
+			const newUri =
+				Filesystem.documentDirectory +
+				"images/" +
+				id +
+				"." +
+				result.assets[0].uri.split(".").pop();
+
+			try {
+				// make the images directory if it doesn't exist
+				await Filesystem.makeDirectoryAsync(
+					Filesystem.documentDirectory + "images",
+					{ intermediates: true }
+				);
+
+				await Filesystem.downloadAsync(result.assets[0].uri, newUri);
+			} catch (e) {
+				console.error(e);
+				setMessage({ message: "Failed to add image", ok: false });
+				return;
+			}
+
 			images.push({
 				id,
-				uri: result.assets[0].uri,
+				uri: newUri,
 				title: "",
 				tags: ["needs tagging"],
 			});
