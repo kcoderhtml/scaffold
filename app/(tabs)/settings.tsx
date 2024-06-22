@@ -182,7 +182,6 @@ export default function Settings() {
 							"Content-Type": "application/json",
 						},
 						body: JSON.stringify({
-							uri: image.uri,
 							title: image.title,
 							tags: image.tags,
 						}),
