@@ -43,6 +43,22 @@ async function describeImage(model: any, asset: any) {
 	return analysisObject;
 }
 
+async function generateUniqueHash(uri: string) {
+	let isUnique = false;
+	let hash = "";
+
+	while (!isUnique) {
+		hash = await JSHash(uri + Math.random(), CONSTANTS.HashAlgorithms.sha256);
+		const allImages = await AsyncStorage.getItem("images");
+		const images = JSON.parse(allImages || "[]");
+		isUnique = !images.some(
+			(image: { id: string; uri: string }) => image.id === hash
+		);
+	}
+
+	return hash;
+}
+
 export default function ImagePickerPage() {
 	const [apiKey, setApiKey] = React.useState<string | null>(null); // State for API key
 	const [message, setMessage] = React.useState<{
@@ -71,10 +87,7 @@ export default function ImagePickerPage() {
 			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 			const images = JSON.parse(allImages || "[]");
-			const id = await JSHash(
-				result.assets[0].uri,
-				CONSTANTS.HashAlgorithms.sha256
-			);
+			const id = await generateUniqueHash(result.assets[0].uri);
 
 			const newUri =
 				Filesystem.documentDirectory +
