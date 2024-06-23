@@ -1,0 +1,12 @@
+name: scaffold
+services:
+  server:
+    ports:
+      - 4221:4221
+    image: kcoderhtml/scaffold-server:latest
+    restart: unless-stopped
+    environment:
+      - TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    init: true
+    volumes:
+      - ./data:/usr/src/app/data
