@@ -1,28 +1,32 @@
-# Welcome to your Expo app 👋
+# Scaffold
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is the repo for Sk4ph (pronounced "scaffold"), a mobile app for managing your photos and screenshots (urls and notes are soon to come). It's built with [Expo](https://expo.dev) and [React Native](https://reactnative.dev).
 
-## Get started
+## Repo Structure
 
-1. Install dependencies
+This repo is a monorepo with the following structure:
+- `apps/server`: The backend server for the app, built with [Elysia](https://elysiajs.com/), [Orama](https://github.com/askorama/orama), and [Bun](https://bun.sh/).
+- `apps/mobile`: The mobile app, built with Expo and React Native.
+- `docs`: Documentation for the project. (coming soon)
 
-   ```bash
-   bun install
-   ```
+## Getting Started
 
-2. Start the app
+To get started, clone the repo and run the following commands:
 
-   ```bash
-    bunx expo start
-   ```
+```bash
+cd apps/mobile
+bun install
+bunx expo start --clear
+```
 
-In the output, you'll find options to open the app in a
+This will start the Expo development server and you can use the Expo Go app to view the app on your phone.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+for the server, run the following commands:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+```bash
+cd apps/server
+bun install
+bun dev
+```
 
-
+This will start the server and you can edit in real-time with hot reloading.
