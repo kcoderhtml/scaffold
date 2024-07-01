@@ -12,186 +12,186 @@ import { JSHash, CONSTANTS } from "react-native-hash";
 import * as ExpoFileSystem from "expo-file-system";
 
 async function fileToGenerativePart(path: string, mimeType: string) {
-	try {
-		const base64image = await ExpoFileSystem.readAsStringAsync(path, {
-			encoding: ExpoFileSystem.EncodingType.Base64,
-		});
-		return {
-			inlineData: {
-				data: base64image,
-				mimeType,
-			},
-		};
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
+  try {
+    const base64image = await ExpoFileSystem.readAsStringAsync(path, {
+      encoding: ExpoFileSystem.EncodingType.Base64,
+    });
+    return {
+      inlineData: {
+        data: base64image,
+        mimeType,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 async function describeImage(model: any, asset: any) {
-	const aiResult = await model.generateContent([
-		'You are to analyze the content of this image and generate a short and conscise json object like the following with no more than 5 tags {"title": "bowl of penne", "tags": ["red", "bowl", "penne", "pasta", "food"]}.',
-		await fileToGenerativePart(asset.uri, asset.mimeType!),
-	]);
-	const response = await aiResult.response;
-	const analysis = response.text();
+  const aiResult = await model.generateContent([
+    'You are to analyze the content of this image and generate a short and conscise json object like the following with no more than 5 tags {"title": "bowl of penne", "tags": ["red", "bowl", "penne", "pasta", "food"]}.',
+    await fileToGenerativePart(asset.uri, asset.mimeType!),
+  ]);
+  const response = await aiResult.response;
+  const analysis = response.text();
 
-	const analysisObject = JSON.parse(analysis);
+  const analysisObject = JSON.parse(analysis);
 
-	return analysisObject;
+  return analysisObject;
 }
 
 async function generateUniqueHash(uri: string) {
-	let isUnique = false;
-	let hash = "";
+  let isUnique = false;
+  let hash = "";
 
-	while (!isUnique) {
-		hash = await JSHash(uri + Math.random(), CONSTANTS.HashAlgorithms.sha256);
-		const allImages = await AsyncStorage.getItem("images");
-		const images = JSON.parse(allImages || "[]");
-		isUnique = !images.some(
-			(image: { id: string; uri: string }) => image.id === hash
-		);
-	}
+  while (!isUnique) {
+    hash = await JSHash(uri + Math.random(), CONSTANTS.HashAlgorithms.sha256);
+    const allImages = await AsyncStorage.getItem("images");
+    const images = JSON.parse(allImages || "[]");
+    isUnique = !images.some(
+      (image: { id: string; uri: string }) => image.id === hash,
+    );
+  }
 
-	return hash;
+  return hash;
 }
 
 export default function ImagePickerPage() {
-	const [apiKey, setApiKey] = React.useState<string | null>(null); // State for API key
-	const [message, setMessage] = React.useState<{
-		message: string;
-		ok: boolean;
-	} | null>(null); // State for message
+  const [apiKey, setApiKey] = React.useState<string | null>(null); // State for API key
+  const [message, setMessage] = React.useState<{
+    message: string;
+    ok: boolean;
+  } | null>(null); // State for message
 
-	React.useEffect(() => {
-		const getApiKey = async () => {
-			const retrievedKey = await SecureStore.getItemAsync("GEMINI_API_KEY");
-			setApiKey(retrievedKey);
-		};
-		getApiKey();
-	}, []);
+  React.useEffect(() => {
+    const getApiKey = async () => {
+      const retrievedKey = await SecureStore.getItemAsync("GEMINI_API_KEY");
+      setApiKey(retrievedKey);
+    };
+    getApiKey();
+  }, []);
 
-	const pickImageAsync = async () => {
-		let result = await ImagePicker.launchImageLibraryAsync({
-			allowsEditing: true,
-			quality: 1,
-		});
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
 
-		if (!result.canceled) {
-			const allImages = await AsyncStorage.getItem("images");
+    if (!result.canceled) {
+      const allImages = await AsyncStorage.getItem("images");
 
-			const genAI = new GoogleGenerativeAI(apiKey!);
-			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const genAI = new GoogleGenerativeAI(apiKey!);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-			const images: {
-				id: string;
-				uri: string;
-				title: string;
-				tags: string[];
-			}[] = JSON.parse(allImages || "[]");
-			const id = await generateUniqueHash(result.assets[0].uri);
+      const images: {
+        id: string;
+        uri: string;
+        title: string;
+        tags: string[];
+      }[] = JSON.parse(allImages || "[]");
+      const id = await generateUniqueHash(result.assets[0].uri);
 
-			const newUri =
-				Filesystem.documentDirectory +
-				"images/" +
-				id +
-				"." +
-				result.assets[0].uri.split(".").pop();
+      const newUri =
+        Filesystem.documentDirectory +
+        "images/" +
+        id +
+        "." +
+        result.assets[0].uri.split(".").pop();
 
-			try {
-				// make the images directory if it doesn't exist
-				await Filesystem.makeDirectoryAsync(
-					Filesystem.documentDirectory + "images",
-					{ intermediates: true }
-				);
+      try {
+        // make the images directory if it doesn't exist
+        await Filesystem.makeDirectoryAsync(
+          Filesystem.documentDirectory + "images",
+          { intermediates: true },
+        );
 
-				await Filesystem.downloadAsync(result.assets[0].uri, newUri);
-			} catch (e) {
-				console.error(e);
-				setMessage({ message: "Failed to add image", ok: false });
-				return;
-			}
+        await Filesystem.downloadAsync(result.assets[0].uri, newUri);
+      } catch (e) {
+        console.error(e);
+        setMessage({ message: "Failed to add image", ok: false });
+        return;
+      }
 
-			images.unshift({
-				id,
-				uri: newUri,
-				title: "",
-				tags: ["needs tagging"],
-			});
+      images.unshift({
+        id,
+        uri: newUri,
+        title: "",
+        tags: ["needs tagging"],
+      });
 
-			await AsyncStorage.setItem("images", JSON.stringify(images));
+      await AsyncStorage.setItem("images", JSON.stringify(images));
 
-			try {
-				if (!apiKey) {
-					throw new Error("No API key found.");
-				}
+      try {
+        if (!apiKey) {
+          throw new Error("No API key found.");
+        }
 
-				console.log("Image analysis started: ", id);
+        console.log("Image analysis started: ", id);
 
-				setTimeout(async () => {
-					const analysisObject = await describeImage(model, result.assets[0]);
+        setTimeout(async () => {
+          const analysisObject = await describeImage(model, result.assets[0]);
 
-					const allImages = await AsyncStorage.getItem("images");
-					const images: {
-						id: string;
-						uri: string;
-						title: string;
-						tags: string[];
-					}[] = JSON.parse(allImages!);
+          const allImages = await AsyncStorage.getItem("images");
+          const images: {
+            id: string;
+            uri: string;
+            title: string;
+            tags: string[];
+          }[] = JSON.parse(allImages!);
 
-					const newImages = images.map((image) => {
-						if (image.id === id) {
-							return {
-								...image,
-								title: analysisObject.title,
-								tags: analysisObject.tags,
-							};
-						} else {
-							return image;
-						}
-					});
+          const newImages = images.map((image) => {
+            if (image.id === id) {
+              return {
+                ...image,
+                title: analysisObject.title,
+                tags: analysisObject.tags,
+              };
+            } else {
+              return image;
+            }
+          });
 
-					await AsyncStorage.setItem("images", JSON.stringify(newImages));
-					console.log("Image analysis complete: ", analysisObject.title);
-				}, 0);
+          await AsyncStorage.setItem("images", JSON.stringify(newImages));
+          console.log("Image analysis complete: ", analysisObject.title);
+        }, 0);
 
-				setMessage({ message: "Image added successfully!", ok: true });
-			} catch (e) {
-				if (e instanceof Error) {
-					console.error(e);
-					setMessage({ message: e.message, ok: false });
-				}
-			}
-		} else {
-			setMessage({ message: "Image selection cancelled.", ok: false });
-		}
-	};
+        setMessage({ message: "Image added successfully!", ok: true });
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e);
+          setMessage({ message: e.message, ok: false });
+        }
+      }
+    } else {
+      setMessage({ message: "Image selection cancelled.", ok: false });
+    }
+  };
 
-	return (
-		<View className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
-			<Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
-				Select an Image to add to your collection! 📸
-			</Text>
+  return (
+    <View className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
+      <Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
+        Select an Image to add to your collection! 📸
+      </Text>
 
-			<Pressable
-				className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
-				onPress={pickImageAsync}
-			>
-				<Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
-					Select an Image
-				</Text>
-			</Pressable>
+      <Pressable
+        className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
+        onPress={pickImageAsync}
+      >
+        <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+          Select an Image
+        </Text>
+      </Pressable>
 
-			{message && (
-				<Text
-					className={`text-xl text-center font-bold mt-8 ${
-						message.ok ? "text-green-500" : "text-red-500"
-					}`}
-				>
-					{message.message}
-				</Text>
-			)}
-		</View>
-	);
+      {message && (
+        <Text
+          className={`text-xl text-center font-bold mt-8 ${
+            message.ok ? "text-green-500" : "text-red-500"
+          }`}
+        >
+          {message.message}
+        </Text>
+      )}
+    </View>
+  );
 }
