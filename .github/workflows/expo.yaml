@@ -28,16 +28,16 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
-        run: pwd; ls; bun install
+        run: cd apps/mobile; bun install
 
       - name: 🚀 Build app
-        run: mkdir builds; eas build -p ios --local --non-interactive --output builds/build.ipa
+        run: cd apps/mobile; mkdir builds; eas build -p ios --local --non-interactive --output builds/build.ipa
 
       - name: 📦 Publish ipa to releases
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./builds/build.ipa
+          file: ./apps/mobile/builds/build.ipa
           asset_name: "app.ipa"
           tag: ${{ github.ref }}
           overwrite: true
@@ -46,4 +46,4 @@ jobs:
         run: bun install -g ios-uploader
 
       - name: 📦 Upload ipa to TestFlight
-        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f ./builds/build.ipa
+        run: ios-uploader upload -u ${{ secrets.APPLE_ID }} -p ${{ secrets.APPLE_PASSWORD }} -f ./apps/mobile/builds/build.ipa
