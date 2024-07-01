@@ -1,8 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Text, View, Image, Pressable, Animated } from "react-native";
 
-import { AntDesign } from "@expo/vector-icons";
-
 import * as Haptics from "expo-haptics";
 
 interface CardProps {
@@ -10,7 +8,6 @@ interface CardProps {
 	title: string;
 	description?: string;
 	tags?: string[];
-	needsSyncing?: boolean;
 	onPress?: () => void;
 	onTagPress?: (tag: string) => void;
 }
@@ -20,7 +17,6 @@ const Card: React.FC<CardProps> = ({
 	title,
 	description,
 	tags,
-	needsSyncing,
 	onPress,
 	onTagPress,
 }) => {
@@ -123,21 +119,6 @@ const Card: React.FC<CardProps> = ({
 									</View>
 								</Pressable>
 							))}
-							{needsSyncing === undefined && (
-								<View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
-									<AntDesign name="cloudo" size={24} color="white" />
-								</View>
-							)}
-							{needsSyncing === true && (
-								<View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
-									<AntDesign name="cloudupload" size={24} color="white" />
-								</View>
-							)}
-							{needsSyncing === false && (
-								<View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
-									<AntDesign name="cloud" size={20} color="white" />
-								</View>
-							)}
 						</View>
 					)}
 				</View>
