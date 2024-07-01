@@ -51,6 +51,11 @@ export default function TabLayout() {
 					href: "../add-image",
 				}}
 				name="add-image-dummy"
+				listeners={() => ({
+					tabPress: (e) => {
+						e.preventDefault();
+					},
+				})}
 			/>
 			<Tabs.Screen
 				name="settings"
