@@ -1,14 +1,9 @@
-import { Text, View } from "react-native";
-import React, { useEffect } from "react";
+import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { Link } from "expo-router";
 
 export default function ImagePickerDummyPage() {
 	const insets = useSafeAreaInsets();
-
-	useEffect(() => {
-		router.push("/");
-	}, []);
 
 	return (
 		<View
@@ -16,8 +11,16 @@ export default function ImagePickerDummyPage() {
 			style={{ paddingTop: insets.top }}
 		>
 			<Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
-				Redirecting you back to the home page immediately!
+				Something went wrong.
 			</Text>
+			<Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg">
+				<Link
+					className="text-xl font-bold text-slate-900 dark:text-slate-200"
+					href="/"
+				>
+					Please click here to go back.
+				</Link>
+			</Pressable>
 		</View>
 	);
 }
