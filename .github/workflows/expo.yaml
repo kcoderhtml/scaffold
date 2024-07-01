@@ -28,7 +28,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📦 Install dependencies
-        run: bun install
+        run: pwd; ls; bun install
 
       - name: 🚀 Build app
         run: mkdir builds; eas build -p ios --local --non-interactive --output builds/build.ipa
