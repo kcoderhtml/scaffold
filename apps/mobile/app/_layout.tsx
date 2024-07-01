@@ -31,6 +31,14 @@ function RootLayoutNav() {
 		<SafeAreaProvider>
 			<Stack>
 				<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+				<Stack.Screen
+					name="add-image"
+					options={{
+						presentation: "modal",
+						headerShown: false,
+						animation: "slide_from_bottom",
+					}}
+				/>
 			</Stack>
 		</SafeAreaProvider>
 	);

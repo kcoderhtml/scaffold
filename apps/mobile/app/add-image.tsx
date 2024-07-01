@@ -1,8 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import React from "react";
 
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Filesystem from "expo-file-system";
@@ -170,13 +168,8 @@ export default function ImagePickerPage() {
 		}
 	};
 
-	const insets = useSafeAreaInsets();
-
 	return (
-		<View
-			className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center"
-			style={{ paddingTop: insets.top }}
-		>
+		<View className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
 			<Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
 				Select an Image to add to your collection! 📸
 			</Text>

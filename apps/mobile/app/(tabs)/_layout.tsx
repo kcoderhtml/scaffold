@@ -43,11 +43,19 @@ export default function TabLayout() {
 				}}
 			/>
 			<Tabs.Screen
-				name="add-image"
 				options={{
-					title: "Add Image",
-					tabBarIcon: ({ color }) => <TabBarIcon name="image" color={color} />,
+					title: "Add",
+					tabBarIcon: ({ color }) => (
+						<TabBarIcon name="plus-square" color={color} />
+					),
+					href: "../add-image",
 				}}
+				name="add-image-dummy"
+				listeners={() => ({
+					tabPress: (e) => {
+						e.preventDefault();
+					},
+				})}
 			/>
 			<Tabs.Screen
 				name="settings"
