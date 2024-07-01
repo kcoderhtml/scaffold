@@ -12,13 +12,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Card from "../../components/card";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Fuse from "fuse.js";
 
 export default function Home() {
 	const [cardData, setCardData] = React.useState<
-		{ uri: string; title: string; tags: string[]; needsSyncing?: boolean }[]
+		{ uri: string; title: string; tags: string[] }[]
 	>([]); // State for card data
 	const [refreshing, setRefreshing] = React.useState(false); // State for refresh indicator
 	const [filter, setFilter] = React.useState<string | null>(null); // State for filter
+	const [fuse, setFuse] = React.useState<Fuse<any>>(
+		new Fuse([], { keys: ["title", "tags"], threshold: 0.3 })
+	);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -26,6 +30,7 @@ export default function Home() {
 			if (allImages) {
 				const images = JSON.parse(allImages);
 				setCardData(images); // Update state with fetched data
+				setFuse(new Fuse(images, { keys: ["title", "tags"], threshold: 0.3 }));
 			}
 		};
 
@@ -39,6 +44,7 @@ export default function Home() {
 		if (allImages) {
 			const images = JSON.parse(allImages);
 			setCardData(images);
+			setFuse(new Fuse(images, { keys: ["title", "tags"], threshold: 0.3 }));
 			setRefreshing(false); // Hide refresh indicator
 		} else {
 			setRefreshing(false); // Hide refresh indicator
@@ -95,14 +101,18 @@ export default function Home() {
 		}
 
 		// search for images with fuzzy search
-		const allImages = await AsyncStorage.getItem("images");
-		const cardData = JSON.parse(allImages || "[]");
+		const filteredData = fuse.search(query);
 
-		const filteredData = cardData.filter(
-			(data: any) => data.tags.includes(query) || data.title.includes(query)
+		setCardData(
+			filteredData.map(
+				(data) =>
+					data.item as {
+						title: string;
+						tags: string[];
+						uri: string;
+					}
+			)
 		);
-
-		setCardData(filteredData);
 	};
 
 	const insets = useSafeAreaInsets();
@@ -142,9 +152,7 @@ export default function Home() {
 						<TextInput
 							className="text-sm font-serif text-slate-900 dark:text-slate-50 italic bg-slate-400 dark:bg-slate-500 pl-2 pr-2 rounded-lg h-full"
 							placeholder="red shoes"
-							onSubmitEditing={async (event) =>
-								await search(event.nativeEvent.text)
-							}
+							onChangeText={async (text) => await search(text)}
 						/>
 					</View>
 
