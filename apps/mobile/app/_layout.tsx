@@ -36,7 +36,7 @@ function RootLayoutNav() {
 					options={{
 						presentation: "modal",
 						headerShown: false,
-						animation: "none",
+						animation: "slide_from_bottom",
 					}}
 				/>
 			</Stack>
