@@ -86,7 +86,12 @@ export default function ImagePickerPage() {
 			const genAI = new GoogleGenerativeAI(apiKey!);
 			const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-			const images = JSON.parse(allImages || "[]");
+			const images: {
+				id: string;
+				uri: string;
+				title: string;
+				tags: string[];
+			}[] = JSON.parse(allImages || "[]");
 			const id = await generateUniqueHash(result.assets[0].uri);
 
 			const newUri =
@@ -110,7 +115,7 @@ export default function ImagePickerPage() {
 				return;
 			}
 
-			images.push({
+			images.unshift({
 				id,
 				uri: newUri,
 				title: "",
