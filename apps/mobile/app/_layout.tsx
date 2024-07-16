@@ -1,29 +1,29 @@
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
-import "react-native-reanimated";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Stack } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
+import { useEffect } from 'react'
+import 'react-native-reanimated'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
-} from "expo-router";
+} from 'expo-router'
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
+  initialRouteName: '(tabs)',
+}
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    SplashScreen.hideAsync()
+  }, [])
 
-  return <RootLayoutNav />;
+  return <RootLayoutNav />
 }
 
 function RootLayoutNav() {
@@ -34,12 +34,12 @@ function RootLayoutNav() {
         <Stack.Screen
           name="add-image"
           options={{
-            presentation: "modal",
+            presentation: 'modal',
             headerShown: false,
-            animation: "slide_from_bottom",
+            animation: 'slide_from_bottom',
           }}
         />
       </Stack>
     </SafeAreaProvider>
-  );
+  )
 }
