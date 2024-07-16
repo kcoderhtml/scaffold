@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fuse from 'fuse.js'
 
 export default function Home() {
-  const [cardData, setCardData] = React.useState<{ uri: string; title: string; tags: string[] }[]>([]) // State for card data
+  const [cardData, setCardData] = React.useState<{ uri?: string; url?: string; title: string; tags: string[] }[]>([]) // State for card data
   const [refreshing, setRefreshing] = React.useState(false) // State for refresh indicator
   const [filter, setFilter] = React.useState<string | null>(null) // State for filter
   const [fuse, setFuse] = React.useState<Fuse<any>>(new Fuse([], { keys: ['title', 'tags'], threshold: 0.3 }))
@@ -98,6 +98,7 @@ export default function Home() {
             title: string
             tags: string[]
             uri: string
+            url: string
           },
       ),
     )
@@ -148,6 +149,7 @@ export default function Home() {
               <Card
                 key={index}
                 image={data.uri}
+                link={data.url ? new URL(data.url) : undefined}
                 title={data.title}
                 tags={data.tags}
                 onPress={() => removeItem(index)}

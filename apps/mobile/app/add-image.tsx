@@ -13,6 +13,8 @@ import { JSHash, CONSTANTS } from 'react-native-hash'
 import * as ExpoFileSystem from 'expo-file-system'
 import * as Clipboard from 'expo-clipboard'
 
+import { getLinkPreview } from 'link-preview-js'
+
 async function fileToGenerativePart(path: string, mimeType: string) {
   try {
     const base64image = await ExpoFileSystem.readAsStringAsync(path, {
@@ -30,10 +32,22 @@ async function fileToGenerativePart(path: string, mimeType: string) {
   }
 }
 
-async function describeImage(model: any, asset: any) {
+async function describeImage(model: any, asset: any, mimeType: string) {
+  let prompt = ''
+  switch (mimeType) {
+    case 'image':
+      prompt = `You are to analyze the content of this image and generate a short and conscise json object like the following with no more than 5 tags {"title": "bowl of penne", "tags": ["red", "bowl", "penne", "pasta", "food"]}. don't include any other text.`
+      break
+    case 'url':
+      prompt = `You are to analyze the content of this web page and generate a short and conscise json object like the following with no more than 5 tags {"title": "a blog post on typescript's powers with bun", "tags": ["ts", "bun", "typescript", "blog", "kieran"]}. don't include any other text.`
+      break
+    default:
+      throw new Error('Unsupported mime type')
+  }
+
   const aiResult = await model.generateContent([
-    'You are to analyze the content of this image and generate a short and conscise json object like the following with no more than 5 tags {"title": "bowl of penne", "tags": ["red", "bowl", "penne", "pasta", "food"]}.',
-    await fileToGenerativePart(asset.uri, asset.mimeType!),
+    prompt,
+    mimeType === 'image' ? await fileToGenerativePart(asset.uri, asset.mimeType!) : JSON.stringify(asset),
   ])
   const response = await aiResult.response
   const analysis = response.text()
@@ -136,7 +150,7 @@ export default function ImagePickerPage() {
         console.log('Image analysis started: ', id)
 
         setTimeout(async () => {
-          const analysisObject = await describeImage(model, result.assets[0])
+          const analysisObject = await describeImage(model, result.assets[0], 'image')
 
           const allImages = await AsyncStorage.getItem('images')
           const images: {
@@ -174,11 +188,107 @@ export default function ImagePickerPage() {
     }
   }
 
+  const addUrl = async () => {
+    if (!clipboardURL) {
+      return
+    }
+
+    const preview = (await getLinkPreview(clipboardURL.toString())) as {
+      url: string
+      title: string
+      siteName: string | undefined
+      description: string | undefined
+      mediaType: string
+      contentType: string | undefined
+      images: string[]
+      videos: {
+        url: string | undefined
+        secureUrl: string | null | undefined
+        type: string | null | undefined
+        width: string | undefined
+        height: string | undefined
+      }[]
+      favicons: string[]
+    }
+
+    const allImages = await AsyncStorage.getItem('images')
+
+    const genAI = new GoogleGenerativeAI(apiKey!)
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+    const images: {
+      id: string
+      url: string
+      title: string
+      tags: string[]
+    }[] = JSON.parse(allImages || '[]')
+    const id = await generateUniqueHash(clipboardURL.href)
+
+    images.unshift({
+      id,
+      title: preview.title,
+      url: clipboardURL.toString(),
+      tags: ['needs tagging'],
+    })
+
+    await AsyncStorage.setItem('images', JSON.stringify(images))
+
+    try {
+      if (!apiKey) {
+        throw new Error('No API key found.')
+      }
+
+      console.log('web page analysis started: ', id)
+
+      setTimeout(async () => {
+        const analysisObject = await describeImage(
+          model,
+          {
+            url: clipboardURL.toString(),
+            title: preview.title,
+            description: preview.description,
+          },
+          'url',
+        )
+
+        const allImages = await AsyncStorage.getItem('images')
+        const images: {
+          id: string
+          uri: string
+          title: string
+          tags: string[]
+        }[] = JSON.parse(allImages!)
+
+        const newImages = images.map(image => {
+          if (image.id === id) {
+            return {
+              ...image,
+              title: analysisObject.title,
+              tags: analysisObject.tags,
+            }
+          } else {
+            return image
+          }
+        })
+
+        await AsyncStorage.setItem('images', JSON.stringify(newImages))
+        console.log('web page analysis complete: ', analysisObject.title)
+      }, 0)
+
+      setMessage({ message: 'web page added successfully!', ok: true })
+    } catch (e) {
+      if (e instanceof Error) {
+        console.error(e)
+        setMessage({ message: e.message, ok: false })
+      }
+    }
+  }
+
   return (
     <View className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
       {clipboardURL && (
         <View className="flex flex-col items-center justify-center">
-          <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={pickImageAsync}>
+          <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={addUrl}>
             <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
               Add {clipboardURL.hostname} to your collection!
             </Text>
