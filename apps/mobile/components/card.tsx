@@ -22,45 +22,49 @@ const Card: React.FC<CardProps> = ({ image, title, description, tags, onPress, o
     <Pressable
       className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1"
       onPressIn={() => {
-        pressStart.current = Date.now()
-
-        // animate to smaller size
-        Animated.timing(scale, {
-          toValue: 0.975,
-          duration: holdDuration * 1000,
-          useNativeDriver: true,
-        }).start(({ finished }) => {
-          // if the press was held for the duration and animation completed, set critPressed to true
-          if (finished) {
-            setCritPressed(true)
-            Haptics.selectionAsync()
-          }
-        })
-      }}
-      onPressOut={() => {
-        // check if the press was a long press
-        if (Date.now() - pressStart.current < holdDuration * 1000) {
-          // if not, animate back to normal
+        // check if the onPress function is defined
+        if (onPress) {
+          pressStart.current = Date.now()
+          // animate to smaller size
           Animated.timing(scale, {
-            toValue: 1,
-            duration: holdDuration * 300,
+            toValue: 0.975,
+            duration: holdDuration * 1000,
             useNativeDriver: true,
-          }).start()
-        } else {
-          // if it was, run the onPress function after animating to smaller size
-          Animated.timing(scale, {
-            toValue: 0.98,
-            duration: holdDuration * 300,
-            useNativeDriver: true,
-          }).start(async ({ finished }) => {
-            // run onPress function after animation
-            if (finished && onPress) {
-              await onPress()
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-              scale.setValue(1)
-              setCritPressed(false)
+          }).start(({ finished }) => {
+            // if the press was held for the duration and animation completed, set critPressed to true
+            if (finished) {
+              setCritPressed(true)
+              Haptics.selectionAsync()
             }
           })
+        }
+      }}
+      onPressOut={() => {
+        if (onPress) {
+          // check if the press was a long press
+          if (Date.now() - pressStart.current < holdDuration * 1000) {
+            // if not, animate back to normal
+            Animated.timing(scale, {
+              toValue: 1,
+              duration: holdDuration * 300,
+              useNativeDriver: true,
+            }).start()
+          } else {
+            // if it was, run the onPress function after animating to smaller size
+            Animated.timing(scale, {
+              toValue: 0.98,
+              duration: holdDuration * 300,
+              useNativeDriver: true,
+            }).start(async ({ finished }) => {
+              // run onPress function after animation
+              if (finished && onPress) {
+                await onPress()
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+                scale.setValue(1)
+                setCritPressed(false)
+              }
+            })
+          }
         }
       }}
     >
