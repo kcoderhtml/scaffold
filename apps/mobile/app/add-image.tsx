@@ -184,7 +184,7 @@ export default function ImagePickerPage() {
             </Text>
           </Pressable>
 
-          <Card image={clipboardURL.origin + '/favicon.ico'} title={clipboardURL.hostname} />
+          <Card link={clipboardURL} title={clipboardURL.hostname} />
         </View>
       )}
 
