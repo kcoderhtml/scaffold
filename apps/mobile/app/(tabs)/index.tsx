@@ -33,6 +33,7 @@ export default function Home() {
     const allImages = await AsyncStorage.getItem('images')
     if (allImages) {
       const images = JSON.parse(allImages)
+      setCardData([])
       setCardData(images)
       setFuse(new Fuse(images, { keys: ['title', 'tags'], threshold: 0.3 }))
       setRefreshing(false) // Hide refresh indicator
@@ -149,7 +150,7 @@ export default function Home() {
               <Card
                 key={index}
                 image={data.uri}
-                link={data.url ? new URL(data.url) : undefined}
+                link={data.url !== undefined ? new URL(data.url) : undefined}
                 title={data.title}
                 tags={data.tags}
                 onPress={() => removeItem(index)}
