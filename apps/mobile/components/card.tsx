@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react'
 import { Text, View, Image, Pressable, Animated } from 'react-native'
 
+import Feather from '@expo/vector-icons/Feather'
+
 import * as Haptics from 'expo-haptics'
 import { getLinkPreview } from 'link-preview-js'
 
@@ -137,6 +139,16 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
 
           {tags && tags.length > 0 && (
             <View className="flex flex-row flex-wrap justify-center">
+              {link && (
+                <View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
+                  <Feather name="link" size={20} color={'white'} />
+                </View>
+              )}
+              {image && (
+                <View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
+                  <Feather name="image" size={20} color={'white'} />
+                </View>
+              )}
               {tags.map((tag, index) => (
                 <Pressable
                   onPress={() => {
