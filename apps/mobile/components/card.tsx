@@ -2,9 +2,11 @@ import React, { useRef, useState } from 'react'
 import { Text, View, Image, Pressable, Animated } from 'react-native'
 
 import * as Haptics from 'expo-haptics'
+import { getLinkPreview } from 'link-preview-js'
 
 interface CardProps {
   image?: string
+  link?: URL
   title: string
   description?: string
   tags?: string[]
@@ -12,11 +14,53 @@ interface CardProps {
   onTagPress?: (tag: string) => void
 }
 
-const Card: React.FC<CardProps> = ({ image, title, description, tags, onPress, onTagPress }) => {
+async function getLinkMeta(link: URL) {
+  const preview = (await getLinkPreview(link.toString())) as {
+    url: string
+    title: string
+    siteName: string | undefined
+    description: string | undefined
+    mediaType: string
+    contentType: string | undefined
+    images: string[]
+    videos: {
+      url: string | undefined
+      secureUrl: string | null | undefined
+      type: string | null | undefined
+      width: string | undefined
+      height: string | undefined
+    }[]
+    favicons: string[]
+  }
+
+  return {
+    title: preview.title,
+    description: preview.description!,
+    imageURL: preview.images[0] || preview.favicons[0],
+    url: link.toString(),
+  }
+}
+
+const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPress, onTagPress }) => {
   const scale = useRef(new Animated.Value(1)).current
   const [critPressed, setCritPressed] = useState(false)
   const pressStart = useRef(0)
   const holdDuration = 0.18
+
+  const [linkMeta, setLinkMeta] = useState<{
+    title: string
+    url: string
+    imageURL: string
+    description: string
+  } | null>(null)
+
+  React.useEffect(() => {
+    if (link !== undefined) {
+      getLinkMeta(link).then(meta => {
+        setLinkMeta(meta)
+      })
+    }
+  }, [link])
 
   return (
     <Pressable
@@ -77,13 +121,20 @@ const Card: React.FC<CardProps> = ({ image, title, description, tags, onPress, o
         }}
       >
         {image && <Image source={{ uri: image }} className="w-56 h-56 object-cover rounded-t" />}
+        {linkMeta && <Image source={{ uri: linkMeta.imageURL }} className="w-56 h-56 object-cover rounded-t" />}
         <View className="w-56">
-          {title !== '' && (
-            <Text className="text-xl font-bold text-slate-900 dark:text-slate-50 p-2 text-center">{title}</Text>
+          {(linkMeta?.title || title) !== '' && (
+            <Text className="text-xl font-bold text-slate-900 dark:text-slate-50 p-2 text-center">
+              {linkMeta?.title || title}
+            </Text>
           )}
-          {description && description !== '' && (
-            <Text className="text-slate-900 dark:text-slate-50 pl-2 pr-2 pb-2 text-center">{description}</Text>
+
+          {(linkMeta?.description || description) !== '' && (
+            <Text className="text-slate-900 dark:text-slate-50 pl-2 pr-2 pb-2 text-center">
+              {linkMeta?.description || description}
+            </Text>
           )}
+
           {tags && tags.length > 0 && (
             <View className="flex flex-row flex-wrap justify-center">
               {tags.map((tag, index) => (
