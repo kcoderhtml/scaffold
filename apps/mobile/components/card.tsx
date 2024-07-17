@@ -1,10 +1,12 @@
 import React, { useRef, useState } from 'react'
-import { Text, View, Image, Pressable, Animated } from 'react-native'
+import { Text, View, Image, Pressable, Animated, TouchableOpacity } from 'react-native'
 
 import Feather from '@expo/vector-icons/Feather'
 
 import * as Haptics from 'expo-haptics'
 import { getLinkPreview } from 'link-preview-js'
+
+import * as Linking from 'expo-linking'
 
 interface CardProps {
   image?: string
@@ -56,6 +58,8 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
     description: string
   } | null>(null)
 
+  const [menuVisible, setMenuVisible] = useState(false)
+
   React.useEffect(() => {
     if (link !== undefined) {
       getLinkMeta(link).then(meta => {
@@ -68,50 +72,43 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
     <Pressable
       className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1"
       onPressIn={() => {
-        // check if the onPress function is defined
-        if (onPress) {
-          pressStart.current = Date.now()
-          // animate to smaller size
-          Animated.timing(scale, {
-            toValue: 0.975,
-            duration: holdDuration * 1000,
-            useNativeDriver: true,
-          }).start(({ finished }) => {
-            // if the press was held for the duration and animation completed, set critPressed to true
-            if (finished) {
-              setCritPressed(true)
-              Haptics.selectionAsync()
-            }
-          })
+        pressStart.current = Date.now()
+
+        if (menuVisible) {
+          return
         }
+        // animate to smaller size
+        Animated.timing(scale, {
+          toValue: 0.975,
+          duration: holdDuration * 1000,
+          useNativeDriver: true,
+        }).start(({ finished }) => {
+          // if the press was held for the duration and animation completed, set critPressed to true
+          if (finished) {
+            setCritPressed(true)
+            Haptics.selectionAsync()
+          }
+        })
       }}
       onPressOut={() => {
-        if (onPress) {
-          // check if the press was a long press
-          if (Date.now() - pressStart.current < holdDuration * 1000) {
-            // if not, animate back to normal
-            Animated.timing(scale, {
-              toValue: 1,
-              duration: holdDuration * 300,
-              useNativeDriver: true,
-            }).start()
-          } else {
-            // if it was, run the onPress function after animating to smaller size
-            Animated.timing(scale, {
-              toValue: 0.98,
-              duration: holdDuration * 300,
-              useNativeDriver: true,
-            }).start(async ({ finished }) => {
-              // run onPress function after animation
-              if (finished && onPress) {
-                await onPress()
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-                scale.setValue(1)
-                setCritPressed(false)
-              }
-            })
-          }
+        if (menuVisible) {
+          return
         }
+        // check if the press was a long press
+        // if it was, run the onPress function after animating to smaller size
+        Animated.timing(scale, {
+          toValue: 0.98,
+          duration: holdDuration * 300,
+          useNativeDriver: true,
+        }).start(async ({ finished }) => {
+          // run onPress function after animation
+          if (finished) {
+            setMenuVisible(true)
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+            scale.setValue(1)
+            setCritPressed(false)
+          }
+        })
       }}
     >
       <Animated.View
@@ -166,6 +163,46 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
             </View>
           )}
         </View>
+        {menuVisible && (
+          <View className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1 border-t-2 border-slate-600 dark:border-slate-700 pt-2 mt-1">
+            <View className="flex flex-row justify-between">
+              {/* a row of touchable elements buttons */}
+              <TouchableOpacity
+                onPress={() => setMenuVisible(false)}
+                className="bg-slate-400 dark:bg-slate-500 p-2 rounded"
+              >
+                <Feather name="x" size={20} color={'white'} />
+              </TouchableOpacity>
+              {/* delete button */}
+              <TouchableOpacity
+                onPress={() => {
+                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+                  setMenuVisible(false)
+                  if (onPress) {
+                    onPress()
+                  }
+                }}
+                className="bg-slate-400 dark:bg-slate-500 p-2 rounded"
+              >
+                <Feather name="trash" size={20} color={'white'} />
+              </TouchableOpacity>
+              {/* check button */}
+              {link && (
+                <TouchableOpacity
+                  onPress={() => Linking.openURL(link.toString())}
+                  className="bg-slate-400 dark:bg-slate-500 p-2 rounded"
+                >
+                  <Feather name="link" size={20} color={'white'} />
+                </TouchableOpacity>
+              )}
+              {image && (
+                <TouchableOpacity onPress={() => {}} className="bg-slate-400 dark:bg-slate-500 p-2 rounded">
+                  <Feather name="image" size={20} color={'white'} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        )}
       </Animated.View>
     </Pressable>
   )
