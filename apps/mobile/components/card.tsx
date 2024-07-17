@@ -72,26 +72,28 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
     <Pressable
       className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1"
       onPressIn={() => {
-        pressStart.current = Date.now()
+        if (onPress) {
+          pressStart.current = Date.now()
 
-        if (menuVisible) {
-          return
-        }
-        // animate to smaller size
-        Animated.timing(scale, {
-          toValue: 0.975,
-          duration: holdDuration * 1000,
-          useNativeDriver: true,
-        }).start(({ finished }) => {
-          // if the press was held for the duration and animation completed, set critPressed to true
-          if (finished) {
-            setCritPressed(true)
-            Haptics.selectionAsync()
+          if (menuVisible) {
+            return
           }
-        })
+          // animate to smaller size
+          Animated.timing(scale, {
+            toValue: 0.975,
+            duration: holdDuration * 1000,
+            useNativeDriver: true,
+          }).start(({ finished }) => {
+            // if the press was held for the duration and animation completed, set critPressed to true
+            if (finished) {
+              setCritPressed(true)
+              Haptics.selectionAsync()
+            }
+          })
+        }
       }}
       onPressOut={() => {
-        if (menuVisible) {
+        if (menuVisible || !onPress) {
           return
         }
         // check if the press was a long press
