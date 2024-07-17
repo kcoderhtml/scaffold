@@ -1,4 +1,5 @@
 import { Pressable, Text, View } from 'react-native'
+import Card from '../components/card'
 import React from 'react'
 
 import * as ImagePicker from 'expo-image-picker'
@@ -10,6 +11,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { JSHash, CONSTANTS } from 'react-native-hash'
 
 import * as ExpoFileSystem from 'expo-file-system'
+import * as Clipboard from 'expo-clipboard'
 
 async function fileToGenerativePart(path: string, mimeType: string) {
   try {
@@ -61,6 +63,7 @@ export default function ImagePickerPage() {
     message: string
     ok: boolean
   } | null>(null) // State for message
+  const [clipboardURL, setClipboardURL] = React.useState<URL | null>(null)
 
   React.useEffect(() => {
     const getApiKey = async () => {
@@ -68,6 +71,19 @@ export default function ImagePickerPage() {
       setApiKey(retrievedKey)
     }
     getApiKey()
+  }, [])
+
+  React.useEffect(() => {
+    const getClipboardText = async () => {
+      const clipboardText = await Clipboard.getStringAsync()
+      // check if its a url
+      const urlRegex = /(https?:\/\/[^\s]+)/g
+      if (clipboardText.match(urlRegex)) {
+        setClipboardURL(new URL(clipboardText))
+        return
+      }
+    }
+    getClipboardText()
   }, [])
 
   const pickImageAsync = async () => {
@@ -160,13 +176,23 @@ export default function ImagePickerPage() {
 
   return (
     <View className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
-      <Text className="text-xl text-center font-bold text-slate-900 dark:text-slate-50">
-        Select an Image to add to your collection! 📸
-      </Text>
+      {clipboardURL && (
+        <View className="flex flex-col items-center justify-center">
+          <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={pickImageAsync}>
+            <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+              Add {clipboardURL.hostname} to your collection!
+            </Text>
+          </Pressable>
 
-      <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={pickImageAsync}>
-        <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">Select an Image</Text>
-      </Pressable>
+          <Card image={clipboardURL.origin + '/favicon.ico'} title={clipboardURL.hostname} />
+        </View>
+      )}
+
+      {!clipboardURL && (
+        <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={pickImageAsync}>
+          <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">Select an Image</Text>
+        </Pressable>
+      )}
 
       {message && (
         <Text className={`text-xl text-center font-bold mt-8 ${message.ok ? 'text-green-500' : 'text-red-500'}`}>
