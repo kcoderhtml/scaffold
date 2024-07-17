@@ -229,6 +229,10 @@ export default function ImagePickerPage() {
 
     await AsyncStorage.setItem('images', JSON.stringify(images))
 
+    // clear clipboard
+    await Clipboard.setStringAsync('')
+    setClipboardURL(null)
+
     try {
       if (!apiKey) {
         throw new Error('No API key found.')
