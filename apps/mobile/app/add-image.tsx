@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, Text, TextInput, View } from 'react-native'
 import Card from '../components/card'
 import React from 'react'
 
@@ -188,12 +188,8 @@ export default function ImagePickerPage() {
     }
   }
 
-  const addUrl = async () => {
-    if (!clipboardURL) {
-      return
-    }
-
-    const preview = (await getLinkPreview(clipboardURL.toString())) as {
+  const addUrl = async (url: URL) => {
+    const preview = (await getLinkPreview(url.toString())) as {
       url: string
       title: string
       siteName: string | undefined
@@ -222,12 +218,12 @@ export default function ImagePickerPage() {
       title: string
       tags: string[]
     }[] = JSON.parse(allImages || '[]')
-    const id = await generateUniqueHash(clipboardURL.href)
+    const id = await generateUniqueHash(url.href)
 
     images.unshift({
       id,
       title: preview.title,
-      url: clipboardURL.toString(),
+      url: url.toString(),
       tags: ['needs tagging'],
     })
 
@@ -244,7 +240,7 @@ export default function ImagePickerPage() {
         const analysisObject = await describeImage(
           model,
           {
-            url: clipboardURL.toString(),
+            url: url.toString(),
             title: preview.title,
             description: preview.description,
           },
@@ -288,7 +284,10 @@ export default function ImagePickerPage() {
     <View className="flex-1 items-center bg-slate-50 dark:bg-slate-700 justify-center">
       {clipboardURL && (
         <View className="flex flex-col items-center justify-center">
-          <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={addUrl}>
+          <Pressable
+            className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg"
+            onPress={() => addUrl(clipboardURL)}
+          >
             <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
               Add {clipboardURL.hostname} to your collection!
             </Text>
@@ -298,10 +297,31 @@ export default function ImagePickerPage() {
         </View>
       )}
 
+      <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={pickImageAsync}>
+        <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">
+          {clipboardURL ? 'Alternatively ' : ''} Select an Image
+        </Text>
+      </Pressable>
+
       {!clipboardURL && (
-        <Pressable className="p-3 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg" onPress={pickImageAsync}>
-          <Text className="text-xl font-bold text-slate-900 dark:text-slate-200">Select an Image</Text>
-        </Pressable>
+        <TextInput
+          className="p-3 mb-36 mt-5 bg-slate-300 dark:bg-slate-600 rounded-lg text-slate-900 dark:text-slate-200 w-9/12"
+          placeholder="Alternatively, enter a website's URL!"
+          onSubmitEditing={event => {
+            let inputURL = event.nativeEvent.text
+            try {
+              // check if it has http or https
+              if (!inputURL.match(/^https?:\/\//)) {
+                inputURL = 'https://' + inputURL
+              }
+              const url = new URL(inputURL)
+              addUrl(url)
+            } catch (error) {
+              setMessage({ message: 'Invalid URL', ok: false })
+            }
+          }}
+          textContentType="URL"
+        />
       )}
 
       {message && (
