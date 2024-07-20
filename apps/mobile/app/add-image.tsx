@@ -13,6 +13,8 @@ import { JSHash, CONSTANTS } from 'react-native-hash'
 import * as ExpoFileSystem from 'expo-file-system'
 import * as Clipboard from 'expo-clipboard'
 
+import { router } from 'expo-router'
+
 import { getLinkPreview } from 'link-preview-js'
 
 async function fileToGenerativePart(path: string, mimeType: string) {
@@ -141,6 +143,7 @@ export default function ImagePickerPage() {
       })
 
       await AsyncStorage.setItem('images', JSON.stringify(images))
+      router.push('/')
 
       try {
         if (!apiKey) {
