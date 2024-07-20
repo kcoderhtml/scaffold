@@ -6,15 +6,13 @@ import Feather from '@expo/vector-icons/Feather'
 import * as Haptics from 'expo-haptics'
 import { getLinkPreview } from 'link-preview-js'
 
-import * as Linking from 'expo-linking'
-
 interface CardProps {
   image?: string
   link?: URL
   title: string
   description?: string
   tags?: string[]
-  onPress?: () => void
+  popUpMenuItems?: { title: string; icon: string; onPress: () => void }[]
   onTagPress?: (tag: string) => void
 }
 
@@ -45,7 +43,7 @@ async function getLinkMeta(link: URL) {
   }
 }
 
-const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPress, onTagPress }) => {
+const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popUpMenuItems, onTagPress }) => {
   const scale = useRef(new Animated.Value(1)).current
   const [critPressed, setCritPressed] = useState(false)
   const pressStart = useRef(0)
@@ -72,7 +70,7 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
     <Pressable
       className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1"
       onPressIn={() => {
-        if (onPress) {
+        if (popUpMenuItems !== undefined && popUpMenuItems.length > 0) {
           pressStart.current = Date.now()
 
           if (menuVisible) {
@@ -86,16 +84,13 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
           }).start(({ finished }) => {
             // if the press was held for the duration and animation completed, set critPressed to true
             if (finished) {
-              setCritPressed(true)
               Haptics.selectionAsync()
             }
           })
         }
       }}
       onPressOut={() => {
-        if (menuVisible || !onPress) {
-          return
-        }
+        if (menuVisible) return
         // check if the press was a long press
         // if it was, run the onPress function after animating to smaller size
         Animated.timing(scale, {
@@ -167,41 +162,29 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, onPr
         </View>
         {menuVisible && (
           <View className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1 border-t-2 border-slate-600 dark:border-slate-700 pt-2 mt-1">
-            <View className="flex flex-row justify-between">
+            <View className="flex flex-row flex-wrap justify-evenly">
               {/* a row of touchable elements buttons */}
               <TouchableOpacity
                 onPress={() => setMenuVisible(false)}
-                className="bg-slate-400 dark:bg-slate-500 p-2 rounded"
+                className="bg-slate-400 dark:bg-slate-500 p-2 rounded m-1"
               >
                 <Feather name="x" size={20} color={'white'} />
               </TouchableOpacity>
-              {/* delete button */}
-              <TouchableOpacity
-                onPress={() => {
-                  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-                  setMenuVisible(false)
-                  if (onPress) {
-                    onPress()
-                  }
-                }}
-                className="bg-slate-400 dark:bg-slate-500 p-2 rounded"
-              >
-                <Feather name="trash" size={20} color={'white'} />
-              </TouchableOpacity>
-              {/* check button */}
-              {link && (
-                <TouchableOpacity
-                  onPress={() => Linking.openURL(link.toString())}
-                  className="bg-slate-400 dark:bg-slate-500 p-2 rounded"
-                >
-                  <Feather name="link" size={20} color={'white'} />
-                </TouchableOpacity>
-              )}
-              {image && (
-                <TouchableOpacity onPress={() => {}} className="bg-slate-400 dark:bg-slate-500 p-2 rounded">
-                  <Feather name="image" size={20} color={'white'} />
-                </TouchableOpacity>
-              )}
+              {popUpMenuItems &&
+                popUpMenuItems.map((item, index) => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+                      setMenuVisible(false)
+                      item.onPress()
+                    }}
+                    key={index}
+                    className="bg-slate-400 dark:bg-slate-500 p-2 rounded m-1"
+                  >
+                    {/* @ts-expect-error */}
+                    <Feather name={item.icon} size={20} color={'white'} />
+                  </TouchableOpacity>
+                ))}
             </View>
           </View>
         )}
