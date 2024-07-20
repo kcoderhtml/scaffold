@@ -135,9 +135,19 @@ const Card: React.FC<CardProps> = ({
           borderColor: critPressed ? 'red' : 'transparent',
         }}
       >
-        {image && <Image source={{ uri: image }} className="w-56 h-56 object-cover rounded-t" />}
-        {linkMeta && <Image source={{ uri: linkMeta.imageURL }} className="w-56 h-56 object-cover rounded-t" />}
-        <View className="w-56">
+        {image && (
+          <Image
+            source={{ uri: image }}
+            className={`${popUpPermanentlyVisible ? 'w-80 h-80' : 'w-56 h-56'} object-cover rounded-t`}
+          />
+        )}
+        {linkMeta && (
+          <Image
+            source={{ uri: linkMeta.imageURL }}
+            className={`${popUpPermanentlyVisible ? 'w-80 h-80' : 'w-56 h-56'} object-cover rounded-t`}
+          />
+        )}
+        <View className={`${popUpPermanentlyVisible ? 'w-80' : 'w-56'} items-center`}>
           {(linkMeta?.title || title) !== '' && (
             <Text className="text-xl font-bold text-slate-900 dark:text-slate-50 p-2 text-center">
               {linkMeta?.title || title}
@@ -151,7 +161,7 @@ const Card: React.FC<CardProps> = ({
           )}
 
           {tags && tags.length > 0 && (
-            <View className="flex flex-row flex-wrap justify-center">
+            <View className={`flex flex-row flex-wrap justify-center pb-2 ${popUpPermanentlyVisible ? 'w-64' : ''}`}>
               {link && (
                 <View className="bg-slate-400 dark:bg-slate-500 rounded-full p-1 pr-2 pl-2 m-1">
                   <Feather name="link" size={20} color={'white'} />
