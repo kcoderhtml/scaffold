@@ -4,7 +4,6 @@ import { Text, View, ScrollView, RefreshControl, TextInput } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Card from '../../components/card'
-import * as Linking from 'expo-linking'
 import { router } from 'expo-router'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -126,12 +125,6 @@ export default function Home() {
                 link={data.url !== undefined ? new URL(data.url) : undefined}
                 title={data.title}
                 tags={data.tags}
-                // popUpMenuItems={[
-                //   { title: 'Remove', onPress: () => removeItem(index), icon: 'trash' },
-                //   data.url
-                //     ? { title: 'Open in Browser', onPress: () => Linking.openURL(data.url!), icon: 'link' }
-                //     : undefined!,
-                // ]}
                 onPress={() => router.navigate('../card-popup?id=' + data.id)}
                 onTagPress={tag => filterbyTag(tag)}
               />
