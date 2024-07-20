@@ -13,6 +13,7 @@ interface CardProps {
   description?: string
   tags?: string[]
   onPress?: () => void
+  popUpPermanentlyVisible?: boolean
   popUpMenuItems?: { title: string; icon: string; onPress: () => void }[]
   onTagPress?: (tag: string) => void
 }
@@ -44,7 +45,17 @@ async function getLinkMeta(link: URL) {
   }
 }
 
-const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popUpMenuItems, onPress, onTagPress }) => {
+const Card: React.FC<CardProps> = ({
+  image,
+  link,
+  title,
+  description,
+  tags,
+  popUpPermanentlyVisible,
+  popUpMenuItems,
+  onPress,
+  onTagPress,
+}) => {
   const scale = useRef(new Animated.Value(1)).current
   const [critPressed, setCritPressed] = useState(false)
   const pressStart = useRef(0)
@@ -71,7 +82,10 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popU
     <Pressable
       className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1"
       onPressIn={() => {
-        if ((popUpMenuItems !== undefined && popUpMenuItems.length > 0) || onPress !== undefined) {
+        if (
+          ((popUpMenuItems !== undefined && popUpMenuItems.length > 0) || onPress !== undefined) &&
+          !popUpPermanentlyVisible
+        ) {
           pressStart.current = Date.now()
 
           if (menuVisible) {
@@ -165,7 +179,7 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popU
             </View>
           )}
         </View>
-        {menuVisible && (
+        {(popUpPermanentlyVisible || menuVisible) && (
           <View className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1 border-t-2 border-slate-600 dark:border-slate-700 pt-2 mt-1">
             <View className="flex flex-row flex-wrap justify-evenly">
               {/* a row of touchable elements buttons */}

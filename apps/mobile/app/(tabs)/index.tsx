@@ -5,12 +5,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Card from '../../components/card'
 import * as Linking from 'expo-linking'
+import { router } from 'expo-router'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fuse from 'fuse.js'
 
 export default function Home() {
-  const [cardData, setCardData] = React.useState<{ uri?: string; url?: string; title: string; tags: string[] }[]>([]) // State for card data
+  const [cardData, setCardData] = React.useState<
+    { id: string; uri?: string; url?: string; title: string; tags: string[] }[]
+  >([]) // State for card data
   const [refreshing, setRefreshing] = React.useState(false) // State for refresh indicator
   const [filter, setFilter] = React.useState<string | null>(null) // State for filter
   const [fuse, setFuse] = React.useState<Fuse<any>>(new Fuse([], { keys: ['title', 'tags'], threshold: 0.3 }))
@@ -43,38 +46,6 @@ export default function Home() {
     }
   }
 
-  const removeItem = async (index: number) => {
-    const allImages = await AsyncStorage.getItem('images')
-    if (allImages) {
-      const parsedImages: [
-        {
-          title: string
-          tags: string[]
-          uri: string
-          needsSyncing?: boolean
-          cloudID: string
-        },
-      ] = JSON.parse(allImages)
-
-      try {
-        parsedImages.splice(index, 1)
-        await AsyncStorage.setItem('images', JSON.stringify(parsedImages))
-        setFilter(null)
-        setCardData(parsedImages)
-      } catch (e) {
-        if (e instanceof Error) {
-          if (e.message === 'Failed to remove image from cloud') {
-            alert('Failed to remove image from cloud')
-            parsedImages.splice(index, 1)
-            await AsyncStorage.setItem('images', JSON.stringify(parsedImages))
-            setFilter(null)
-            setCardData(parsedImages)
-          }
-        }
-      }
-    }
-  }
-
   const filterbyTag = async (tag: string) => {
     const allImages = await AsyncStorage.getItem('images')
     const cardData = JSON.parse(allImages || '[]')
@@ -97,6 +68,7 @@ export default function Home() {
       filteredData.map(
         data =>
           data.item as {
+            id: string
             title: string
             tags: string[]
             uri: string
@@ -154,12 +126,13 @@ export default function Home() {
                 link={data.url !== undefined ? new URL(data.url) : undefined}
                 title={data.title}
                 tags={data.tags}
-                popUpMenuItems={[
-                  { title: 'Remove', onPress: () => removeItem(index), icon: 'trash' },
-                  data.url
-                    ? { title: 'Open in Browser', onPress: () => Linking.openURL(data.url!), icon: 'link' }
-                    : undefined!,
-                ]}
+                // popUpMenuItems={[
+                //   { title: 'Remove', onPress: () => removeItem(index), icon: 'trash' },
+                //   data.url
+                //     ? { title: 'Open in Browser', onPress: () => Linking.openURL(data.url!), icon: 'link' }
+                //     : undefined!,
+                // ]}
+                onPress={() => router.navigate('../card-popup?id=' + data.id)}
                 onTagPress={tag => filterbyTag(tag)}
               />
             ))}
