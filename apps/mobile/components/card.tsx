@@ -12,6 +12,7 @@ interface CardProps {
   title: string
   description?: string
   tags?: string[]
+  onPress?: () => void
   popUpMenuItems?: { title: string; icon: string; onPress: () => void }[]
   onTagPress?: (tag: string) => void
 }
@@ -43,7 +44,7 @@ async function getLinkMeta(link: URL) {
   }
 }
 
-const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popUpMenuItems, onTagPress }) => {
+const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popUpMenuItems, onPress, onTagPress }) => {
   const scale = useRef(new Animated.Value(1)).current
   const [critPressed, setCritPressed] = useState(false)
   const pressStart = useRef(0)
@@ -70,7 +71,7 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popU
     <Pressable
       className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1"
       onPressIn={() => {
-        if (popUpMenuItems !== undefined && popUpMenuItems.length > 0) {
+        if ((popUpMenuItems !== undefined && popUpMenuItems.length > 0) || onPress !== undefined) {
           pressStart.current = Date.now()
 
           if (menuVisible) {
@@ -100,7 +101,11 @@ const Card: React.FC<CardProps> = ({ image, link, title, description, tags, popU
         }).start(async ({ finished }) => {
           // run onPress function after animation
           if (finished) {
-            setMenuVisible(true)
+            if (onPress) {
+              onPress()
+            } else {
+              setMenuVisible(true)
+            }
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
             scale.setValue(1)
             setCritPressed(false)
