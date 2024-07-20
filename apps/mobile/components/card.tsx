@@ -105,7 +105,7 @@ const Card: React.FC<CardProps> = ({
         }
       }}
       onPressOut={() => {
-        if (menuVisible) return
+        if (menuVisible || popUpPermanentlyVisible) return
         // check if the press was a long press
         // if it was, run the onPress function after animating to smaller size
         Animated.timing(scale, {
