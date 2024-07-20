@@ -61,7 +61,7 @@ export default function CardPopupPage() {
         1,
       )
       await AsyncStorage.setItem('images', JSON.stringify(parsedImages))
-      router.navigate('/')
+      router.replace('/')
     }
   }
 
