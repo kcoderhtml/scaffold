@@ -183,12 +183,14 @@ const Card: React.FC<CardProps> = ({
           <View className="bg-slate-300 dark:bg-slate-600 rounded-lg shadow-md m-1 border-t-2 border-slate-600 dark:border-slate-700 pt-2 mt-1">
             <View className="flex flex-row flex-wrap justify-evenly">
               {/* a row of touchable elements buttons */}
-              <TouchableOpacity
-                onPress={() => setMenuVisible(false)}
-                className="bg-slate-400 dark:bg-slate-500 p-2 rounded m-1"
-              >
-                <Feather name="x" size={20} color={'white'} />
-              </TouchableOpacity>
+              {!popUpPermanentlyVisible && (
+                <TouchableOpacity
+                  onPress={() => setMenuVisible(false)}
+                  className="bg-slate-400 dark:bg-slate-500 p-2 rounded m-1"
+                >
+                  <Feather name="x" size={20} color={'white'} />
+                </TouchableOpacity>
+              )}
               {popUpMenuItems &&
                 popUpMenuItems
                   .filter(item => item !== undefined)
