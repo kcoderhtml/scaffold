@@ -190,20 +190,22 @@ const Card: React.FC<CardProps> = ({
                 <Feather name="x" size={20} color={'white'} />
               </TouchableOpacity>
               {popUpMenuItems &&
-                popUpMenuItems.map((item, index) => (
-                  <TouchableOpacity
-                    onPress={() => {
-                      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-                      setMenuVisible(false)
-                      item.onPress()
-                    }}
-                    key={index}
-                    className="bg-slate-400 dark:bg-slate-500 p-2 rounded m-1"
-                  >
-                    {/* @ts-expect-error */}
-                    <Feather name={item.icon} size={20} color={'white'} />
-                  </TouchableOpacity>
-                ))}
+                popUpMenuItems
+                  .filter(item => item !== undefined)
+                  .map((item, index) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+                        setMenuVisible(false)
+                        item.onPress()
+                      }}
+                      key={index}
+                      className="bg-slate-400 dark:bg-slate-500 p-2 rounded m-1"
+                    >
+                      {/* @ts-expect-error */}
+                      <Feather name={item.icon} size={20} color={'white'} />
+                    </TouchableOpacity>
+                  ))}
             </View>
           </View>
         )}
