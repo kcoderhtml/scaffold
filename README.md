@@ -24,7 +24,7 @@ This will start the Expo development server and you can use the Expo Go app to v
 
 ## Screenshots
 <p>
-    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/home.jpg" >
-    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/settings.jpg" >
-    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/add.jpg" >
+    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/home.jpg" width="300">
+    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/settings.jpg" width="300">
+    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/add.jpg" width="300">
 </p>
