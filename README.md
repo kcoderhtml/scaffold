@@ -2,6 +2,8 @@
 
 This is the repo for Sk4ph (pronounced "scaffold"), a mobile app for managing your photos and screenshots (urls and notes are soon to come). It's built with [Expo](https://expo.dev) and [React Native](https://reactnative.dev).
 
+It's basicaly a second brain app based off [mymind](https://mymind.com/) but a fair bit worse 😭; at least its all open source and works offline! You can add links and images to the app and it will tag them and make them searchable with super fast offline search. You can see a demo of it on youtube [here](https://www.youtube.com/shorts/m5ASqlrYX_Q).
+
 ## Repo Structure
 
 This repo is a monorepo with the following structure:
