@@ -21,3 +21,10 @@ bunx expo start --clear
 ```
 
 This will start the Expo development server and you can use the Expo Go app to view the app on your phone.
+
+## Screenshots
+<p>
+    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/home.jpg" >
+    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/settings.jpg" >
+    <img src="https://github.com/kcoderhtml/scaffold/raw/master/.github/images/add.jpg" >
+</p>
